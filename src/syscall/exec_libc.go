@@ -2,9 +2,15 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+// +build aix solaris
+
+// This file handles forkAndExecInChild function for OS using libc syscall like AIX or Solaris.
+// It was previously exec_solaris.go
+
 package syscall
 
 import (
+	"runtime"
 	"unsafe"
 )
 
@@ -28,6 +34,7 @@ func runtime_AfterForkInChild()
 func chdir(path uintptr) (err Errno)
 func chroot1(path uintptr) (err Errno)
 func close(fd uintptr) (err Errno)
+func dup2child(old uintptr, new uintptr) (val uintptr, err Errno)
 func execve(path uintptr, argv uintptr, envp uintptr) (err Errno)
 func exit(code uintptr)
 func fcntl1(fd uintptr, cmd uintptr, arg uintptr) (val uintptr, err Errno)
@@ -41,9 +48,15 @@ func setuid(uid uintptr) (err Errno)
 func setpgid(pid uintptr, pgid uintptr) (err Errno)
 func write1(fd uintptr, buf uintptr, nbyte uintptr) (n uintptr, err Errno)
 
+// Those constants are defined for compatibility purpose, but are meaningless
+const (
+	SYS_EXECVE = 0xDEAD
+	SYS_FCNTL  = 0xDEAD
+)
+
 // syscall defines this global on our behalf to avoid a build dependency on other platforms
 func init() {
-	execveSolaris = execve
+	execveLibc = execve
 }
 
 // Fork, dup fd onto 0..len(fd), and exec(argv0, argvv, envv) in child.
@@ -178,7 +191,13 @@ func forkAndExecInChild(argv0 *byte, argv, envv []*byte, chroot, dir *byte, attr
 	// Pass 1: look for fd[i] < i and move those up above len(fd)
 	// so that pass 2 won't stomp on an fd it needs later.
 	if pipe < nextfd {
-		_, err1 = fcntl1(uintptr(pipe), F_DUP2FD, uintptr(nextfd))
+		if runtime.GOOS == "aix" {
+			// fcntl with F_DUP2FD isn't working properly on Aix
+			// and must be replaced by dup2 syscall
+			_, err1 = dup2child(uintptr(pipe), uintptr(nextfd))
+		} else {
+			_, err1 = fcntl1(uintptr(pipe), F_DUP2FD, uintptr(nextfd))
+		}
 		if err1 != 0 {
 			goto childerror
 		}
@@ -191,11 +210,19 @@ func forkAndExecInChild(argv0 *byte, argv, envv []*byte, chroot, dir *byte, attr
 			if nextfd == pipe { // don't stomp on pipe
 				nextfd++
 			}
-			_, err1 = fcntl1(uintptr(fd[i]), F_DUP2FD, uintptr(nextfd))
+			if runtime.GOOS == "aix" {
+				// fcntl syscall
+				_, err1 = dup2child(uintptr(fd[i]), uintptr(nextfd))
+			} else {
+				_, err1 = fcntl1(uintptr(fd[i]), F_DUP2FD, uintptr(nextfd))
+			}
 			if err1 != 0 {
 				goto childerror
 			}
-			fcntl1(uintptr(nextfd), F_SETFD, FD_CLOEXEC)
+			_, err1 = fcntl1(uintptr(nextfd), F_SETFD, FD_CLOEXEC)
+			if err1 != 0 {
+				goto childerror
+			}
 			fd[i] = nextfd
 			nextfd++
 		}
@@ -218,7 +245,12 @@ func forkAndExecInChild(argv0 *byte, argv, envv []*byte, chroot, dir *byte, attr
 		}
 		// The new fd is created NOT close-on-exec,
 		// which is exactly what we want.
-		_, err1 = fcntl1(uintptr(fd[i]), F_DUP2FD, uintptr(i))
+		if runtime.GOOS == "aix" {
+			// fcntl syscall
+			_, err1 = dup2child(uintptr(fd[i]), uintptr(i))
+		} else {
+			_, err1 = fcntl1(uintptr(fd[i]), F_DUP2FD, uintptr(i))
+		}
 		if err1 != 0 {
 			goto childerror
 		}
@@ -242,6 +274,11 @@ func forkAndExecInChild(argv0 *byte, argv, envv []*byte, chroot, dir *byte, attr
 
 	// Set the controlling TTY to Ctty
 	if sys.Setctty {
+		// On Aix, TIOCSCTTY is undefined
+		if TIOCSCTTY == 0 {
+			err1 = ENOSYS
+			goto childerror
+		}
 		err1 = ioctl(uintptr(sys.Ctty), uintptr(TIOCSCTTY), 0)
 		if err1 != 0 {
 			goto childerror

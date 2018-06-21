@@ -23,6 +23,10 @@ TEXT ·chroot1(SB),NOSPLIT,$0
 TEXT ·close(SB),NOSPLIT,$0
 	JMP	runtime·syscall_close(SB)
 
+// Here for linkage purpose
+TEXT ·dup2child(SB),NOSPLIT,$0
+	RET
+
 TEXT ·execve(SB),NOSPLIT,$0
 	JMP	runtime·syscall_execve(SB)
 
