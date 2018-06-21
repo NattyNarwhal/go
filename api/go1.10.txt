@@ -560,6 +560,421 @@ pkg debug/macho, type RpathCmd struct, Cmd LoadCmd
 pkg debug/macho, type RpathCmd struct, Len uint32
 pkg debug/macho, type RpathCmd struct, Path uint32
 pkg debug/macho, type Section struct, Relocs []Reloc
+pkg debug/xcoff, const C_BCOMM = 135
+pkg debug/xcoff, const C_BCOMM ideal-int
+pkg debug/xcoff, const C_BINCL = 108
+pkg debug/xcoff, const C_BINCL ideal-int
+pkg debug/xcoff, const C_BLOCK = 100
+pkg debug/xcoff, const C_BLOCK ideal-int
+pkg debug/xcoff, const C_BSTAT = 143
+pkg debug/xcoff, const C_BSTAT ideal-int
+pkg debug/xcoff, const C_DECL = 140
+pkg debug/xcoff, const C_DECL ideal-int
+pkg debug/xcoff, const C_DWARF = 112
+pkg debug/xcoff, const C_DWARF ideal-int
+pkg debug/xcoff, const C_ECOML = 136
+pkg debug/xcoff, const C_ECOML ideal-int
+pkg debug/xcoff, const C_ECOMM = 137
+pkg debug/xcoff, const C_ECOMM ideal-int
+pkg debug/xcoff, const C_EINCL = 109
+pkg debug/xcoff, const C_EINCL ideal-int
+pkg debug/xcoff, const C_ENTRY = 141
+pkg debug/xcoff, const C_ENTRY ideal-int
+pkg debug/xcoff, const C_ESTAT = 144
+pkg debug/xcoff, const C_ESTAT ideal-int
+pkg debug/xcoff, const C_EXT = 2
+pkg debug/xcoff, const C_EXT ideal-int
+pkg debug/xcoff, const C_FCN = 101
+pkg debug/xcoff, const C_FCN ideal-int
+pkg debug/xcoff, const C_FILE = 103
+pkg debug/xcoff, const C_FILE ideal-int
+pkg debug/xcoff, const C_FUN = 142
+pkg debug/xcoff, const C_FUN ideal-int
+pkg debug/xcoff, const C_GSYM = 128
+pkg debug/xcoff, const C_GSYM ideal-int
+pkg debug/xcoff, const C_GTLS = 145
+pkg debug/xcoff, const C_GTLS ideal-int
+pkg debug/xcoff, const C_HIDEXT = 107
+pkg debug/xcoff, const C_HIDEXT ideal-int
+pkg debug/xcoff, const C_LSYM = 129
+pkg debug/xcoff, const C_LSYM ideal-int
+pkg debug/xcoff, const C_NULL = 0
+pkg debug/xcoff, const C_NULL ideal-int
+pkg debug/xcoff, const C_PSYM = 130
+pkg debug/xcoff, const C_PSYM ideal-int
+pkg debug/xcoff, const C_RPSYM = 132
+pkg debug/xcoff, const C_RPSYM ideal-int
+pkg debug/xcoff, const C_RSYM = 131
+pkg debug/xcoff, const C_RSYM ideal-int
+pkg debug/xcoff, const C_STAT = 3
+pkg debug/xcoff, const C_STAT ideal-int
+pkg debug/xcoff, const C_STSYM = 133
+pkg debug/xcoff, const C_STSYM ideal-int
+pkg debug/xcoff, const C_STTLS = 146
+pkg debug/xcoff, const C_STTLS ideal-int
+pkg debug/xcoff, const C_WEAKEXT = 111
+pkg debug/xcoff, const C_WEAKEXT ideal-int
+pkg debug/xcoff, const FILHSZ_32 = 20
+pkg debug/xcoff, const FILHSZ_32 ideal-int
+pkg debug/xcoff, const FILHSZ_64 = 24
+pkg debug/xcoff, const FILHSZ_64 ideal-int
+pkg debug/xcoff, const F_DSA = 64
+pkg debug/xcoff, const F_DSA ideal-int
+pkg debug/xcoff, const F_DYNLOAD = 4096
+pkg debug/xcoff, const F_DYNLOAD ideal-int
+pkg debug/xcoff, const F_EXEC = 2
+pkg debug/xcoff, const F_EXEC ideal-int
+pkg debug/xcoff, const F_FDPR_OPTI = 32
+pkg debug/xcoff, const F_FDPR_OPTI ideal-int
+pkg debug/xcoff, const F_FDPR_PROF = 16
+pkg debug/xcoff, const F_FDPR_PROF ideal-int
+pkg debug/xcoff, const F_LNNO = 4
+pkg debug/xcoff, const F_LNNO ideal-int
+pkg debug/xcoff, const F_LOADONLY = 16384
+pkg debug/xcoff, const F_LOADONLY ideal-int
+pkg debug/xcoff, const F_RELFLG = 1
+pkg debug/xcoff, const F_RELFLG ideal-int
+pkg debug/xcoff, const F_SHROBJ = 8192
+pkg debug/xcoff, const F_SHROBJ ideal-int
+pkg debug/xcoff, const F_VARPG = 256
+pkg debug/xcoff, const F_VARPG ideal-int
+pkg debug/xcoff, const LDHDRSZ_32 = 32
+pkg debug/xcoff, const LDHDRSZ_32 ideal-int
+pkg debug/xcoff, const LDHDRSZ_64 = 56
+pkg debug/xcoff, const LDHDRSZ_64 ideal-int
+pkg debug/xcoff, const R_BA = 8
+pkg debug/xcoff, const R_BA ideal-int
+pkg debug/xcoff, const R_BR = 10
+pkg debug/xcoff, const R_BR ideal-int
+pkg debug/xcoff, const R_GL = 5
+pkg debug/xcoff, const R_GL ideal-int
+pkg debug/xcoff, const R_NEG = 1
+pkg debug/xcoff, const R_NEG ideal-int
+pkg debug/xcoff, const R_POS = 0
+pkg debug/xcoff, const R_POS ideal-int
+pkg debug/xcoff, const R_RBA = 24
+pkg debug/xcoff, const R_RBA ideal-int
+pkg debug/xcoff, const R_RBR = 26
+pkg debug/xcoff, const R_RBR ideal-int
+pkg debug/xcoff, const R_REF = 15
+pkg debug/xcoff, const R_REF ideal-int
+pkg debug/xcoff, const R_REL = 2
+pkg debug/xcoff, const R_REL ideal-int
+pkg debug/xcoff, const R_RL = 12
+pkg debug/xcoff, const R_RL ideal-int
+pkg debug/xcoff, const R_RLA = 13
+pkg debug/xcoff, const R_RLA ideal-int
+pkg debug/xcoff, const R_TCL = 6
+pkg debug/xcoff, const R_TCL ideal-int
+pkg debug/xcoff, const R_TLS = 32
+pkg debug/xcoff, const R_TLS ideal-int
+pkg debug/xcoff, const R_TLSM = 36
+pkg debug/xcoff, const R_TLSM ideal-int
+pkg debug/xcoff, const R_TLSML = 37
+pkg debug/xcoff, const R_TLSML ideal-int
+pkg debug/xcoff, const R_TLS_IE = 33
+pkg debug/xcoff, const R_TLS_IE ideal-int
+pkg debug/xcoff, const R_TLS_LD = 34
+pkg debug/xcoff, const R_TLS_LD ideal-int
+pkg debug/xcoff, const R_TLS_LE = 35
+pkg debug/xcoff, const R_TLS_LE ideal-int
+pkg debug/xcoff, const R_TOC = 3
+pkg debug/xcoff, const R_TOC ideal-int
+pkg debug/xcoff, const R_TOCL = 49
+pkg debug/xcoff, const R_TOCL ideal-int
+pkg debug/xcoff, const R_TOCU = 48
+pkg debug/xcoff, const R_TOCU ideal-int
+pkg debug/xcoff, const R_TRL = 18
+pkg debug/xcoff, const R_TRL ideal-int
+pkg debug/xcoff, const R_TRLA = 19
+pkg debug/xcoff, const R_TRLA ideal-int
+pkg debug/xcoff, const SSUBTYP_DWABREV = 393216
+pkg debug/xcoff, const SSUBTYP_DWABREV ideal-int
+pkg debug/xcoff, const SSUBTYP_DWARNGE = 327680
+pkg debug/xcoff, const SSUBTYP_DWARNGE ideal-int
+pkg debug/xcoff, const SSUBTYP_DWFRAME = 655360
+pkg debug/xcoff, const SSUBTYP_DWFRAME ideal-int
+pkg debug/xcoff, const SSUBTYP_DWINFO = 65536
+pkg debug/xcoff, const SSUBTYP_DWINFO ideal-int
+pkg debug/xcoff, const SSUBTYP_DWLINE = 131072
+pkg debug/xcoff, const SSUBTYP_DWLINE ideal-int
+pkg debug/xcoff, const SSUBTYP_DWLOC = 589824
+pkg debug/xcoff, const SSUBTYP_DWLOC ideal-int
+pkg debug/xcoff, const SSUBTYP_DWMAC = 720896
+pkg debug/xcoff, const SSUBTYP_DWMAC ideal-int
+pkg debug/xcoff, const SSUBTYP_DWPBNMS = 196608
+pkg debug/xcoff, const SSUBTYP_DWPBNMS ideal-int
+pkg debug/xcoff, const SSUBTYP_DWPBTYP = 262144
+pkg debug/xcoff, const SSUBTYP_DWPBTYP ideal-int
+pkg debug/xcoff, const SSUBTYP_DWRNGES = 524288
+pkg debug/xcoff, const SSUBTYP_DWRNGES ideal-int
+pkg debug/xcoff, const SSUBTYP_DWSTR = 458752
+pkg debug/xcoff, const SSUBTYP_DWSTR ideal-int
+pkg debug/xcoff, const STYP_BSS = 128
+pkg debug/xcoff, const STYP_BSS ideal-int
+pkg debug/xcoff, const STYP_DATA = 64
+pkg debug/xcoff, const STYP_DATA ideal-int
+pkg debug/xcoff, const STYP_DEBUG = 8192
+pkg debug/xcoff, const STYP_DEBUG ideal-int
+pkg debug/xcoff, const STYP_DWARF = 16
+pkg debug/xcoff, const STYP_DWARF ideal-int
+pkg debug/xcoff, const STYP_EXCEPT = 256
+pkg debug/xcoff, const STYP_EXCEPT ideal-int
+pkg debug/xcoff, const STYP_INFO = 512
+pkg debug/xcoff, const STYP_INFO ideal-int
+pkg debug/xcoff, const STYP_LOADER = 4096
+pkg debug/xcoff, const STYP_LOADER ideal-int
+pkg debug/xcoff, const STYP_OVRFLO = 32768
+pkg debug/xcoff, const STYP_OVRFLO ideal-int
+pkg debug/xcoff, const STYP_TBSS = 2048
+pkg debug/xcoff, const STYP_TBSS ideal-int
+pkg debug/xcoff, const STYP_TDATA = 1024
+pkg debug/xcoff, const STYP_TDATA ideal-int
+pkg debug/xcoff, const STYP_TEXT = 32
+pkg debug/xcoff, const STYP_TEXT ideal-int
+pkg debug/xcoff, const STYP_TYPCHK = 16384
+pkg debug/xcoff, const STYP_TYPCHK ideal-int
+pkg debug/xcoff, const SYMESZ = 18
+pkg debug/xcoff, const SYMESZ ideal-int
+pkg debug/xcoff, const U64_TOCMAGIC = 503
+pkg debug/xcoff, const U64_TOCMAGIC ideal-int
+pkg debug/xcoff, const U802TOCMAGIC = 479
+pkg debug/xcoff, const U802TOCMAGIC ideal-int
+pkg debug/xcoff, const XFT_CD = 128
+pkg debug/xcoff, const XFT_CD ideal-int
+pkg debug/xcoff, const XFT_CT = 1
+pkg debug/xcoff, const XFT_CT ideal-int
+pkg debug/xcoff, const XFT_CV = 2
+pkg debug/xcoff, const XFT_CV ideal-int
+pkg debug/xcoff, const XFT_FN = 0
+pkg debug/xcoff, const XFT_FN ideal-int
+pkg debug/xcoff, const XMC_BS = 9
+pkg debug/xcoff, const XMC_BS ideal-int
+pkg debug/xcoff, const XMC_DB = 2
+pkg debug/xcoff, const XMC_DB ideal-int
+pkg debug/xcoff, const XMC_DS = 10
+pkg debug/xcoff, const XMC_DS ideal-int
+pkg debug/xcoff, const XMC_GL = 6
+pkg debug/xcoff, const XMC_GL ideal-int
+pkg debug/xcoff, const XMC_PR = 0
+pkg debug/xcoff, const XMC_PR ideal-int
+pkg debug/xcoff, const XMC_RO = 1
+pkg debug/xcoff, const XMC_RO ideal-int
+pkg debug/xcoff, const XMC_RW = 5
+pkg debug/xcoff, const XMC_RW ideal-int
+pkg debug/xcoff, const XMC_SV = 8
+pkg debug/xcoff, const XMC_SV ideal-int
+pkg debug/xcoff, const XMC_SV3264 = 18
+pkg debug/xcoff, const XMC_SV3264 ideal-int
+pkg debug/xcoff, const XMC_SV64 = 17
+pkg debug/xcoff, const XMC_SV64 ideal-int
+pkg debug/xcoff, const XMC_TC = 3
+pkg debug/xcoff, const XMC_TC ideal-int
+pkg debug/xcoff, const XMC_TC0 = 15
+pkg debug/xcoff, const XMC_TC0 ideal-int
+pkg debug/xcoff, const XMC_TD = 16
+pkg debug/xcoff, const XMC_TD ideal-int
+pkg debug/xcoff, const XMC_TE = 22
+pkg debug/xcoff, const XMC_TE ideal-int
+pkg debug/xcoff, const XMC_TL = 20
+pkg debug/xcoff, const XMC_TL ideal-int
+pkg debug/xcoff, const XMC_UA = 4
+pkg debug/xcoff, const XMC_UA ideal-int
+pkg debug/xcoff, const XMC_UC = 11
+pkg debug/xcoff, const XMC_UC ideal-int
+pkg debug/xcoff, const XMC_UL = 21
+pkg debug/xcoff, const XMC_UL ideal-int
+pkg debug/xcoff, const XMC_XO = 7
+pkg debug/xcoff, const XMC_XO ideal-int
+pkg debug/xcoff, const XTY_CM = 3
+pkg debug/xcoff, const XTY_CM ideal-int
+pkg debug/xcoff, const XTY_ER = 0
+pkg debug/xcoff, const XTY_ER ideal-int
+pkg debug/xcoff, const XTY_LD = 2
+pkg debug/xcoff, const XTY_LD ideal-int
+pkg debug/xcoff, const XTY_SD = 1
+pkg debug/xcoff, const XTY_SD ideal-int
+pkg debug/xcoff, func NewFile(io.ReaderAt) (*File, error)
+pkg debug/xcoff, func Open(string) (*File, error)
+pkg debug/xcoff, method (*File) CSect(string) []uint8
+pkg debug/xcoff, method (*File) Close() error
+pkg debug/xcoff, method (*File) DWARF() (*dwarf.Data, error)
+pkg debug/xcoff, method (*File) ImportedLibraries() ([]string, error)
+pkg debug/xcoff, method (*File) ImportedSymbols() ([]ImportedSymbol, error)
+pkg debug/xcoff, method (*File) SectionByType(uint32) *Section
+pkg debug/xcoff, method (*FormatError) Error() string
+pkg debug/xcoff, method (*Section) Data() ([]uint8, error)
+pkg debug/xcoff, method (Section) ReadAt([]uint8, int64) (int, error)
+pkg debug/xcoff, type AuxCSect32 struct
+pkg debug/xcoff, type AuxCSect32 struct, Xparmhash uint32
+pkg debug/xcoff, type AuxCSect32 struct, Xscnlen int32
+pkg debug/xcoff, type AuxCSect32 struct, Xsmclas uint8
+pkg debug/xcoff, type AuxCSect32 struct, Xsmtyp uint8
+pkg debug/xcoff, type AuxCSect32 struct, Xsnhash uint16
+pkg debug/xcoff, type AuxCSect32 struct, Xsnstab uint16
+pkg debug/xcoff, type AuxCSect32 struct, Xstab uint32
+pkg debug/xcoff, type AuxCSect64 struct
+pkg debug/xcoff, type AuxCSect64 struct, Xauxtype uint8
+pkg debug/xcoff, type AuxCSect64 struct, Xpad uint8
+pkg debug/xcoff, type AuxCSect64 struct, Xparmhash uint32
+pkg debug/xcoff, type AuxCSect64 struct, Xscnlenhi int32
+pkg debug/xcoff, type AuxCSect64 struct, Xscnlenlo uint32
+pkg debug/xcoff, type AuxCSect64 struct, Xsmclas uint8
+pkg debug/xcoff, type AuxCSect64 struct, Xsmtyp uint8
+pkg debug/xcoff, type AuxCSect64 struct, Xsnhash uint16
+pkg debug/xcoff, type AuxFcn64 struct
+pkg debug/xcoff, type AuxFcn64 struct, Xauxtype uint8
+pkg debug/xcoff, type AuxFcn64 struct, Xendndx uint32
+pkg debug/xcoff, type AuxFcn64 struct, Xfsize uint32
+pkg debug/xcoff, type AuxFcn64 struct, Xlnnoptr uint64
+pkg debug/xcoff, type AuxFcn64 struct, Xpad uint8
+pkg debug/xcoff, type AuxFile64 struct
+pkg debug/xcoff, type AuxFile64 struct, Xauxtype uint8
+pkg debug/xcoff, type AuxFile64 struct, Xfname [8]uint8
+pkg debug/xcoff, type AuxFile64 struct, Xftype uint8
+pkg debug/xcoff, type AuxSect64 struct
+pkg debug/xcoff, type AuxSect64 struct, Xauxtype uint8
+pkg debug/xcoff, type AuxSect64 struct, Xnreloc uint64
+pkg debug/xcoff, type AuxSect64 struct, Xscnlen uint64
+pkg debug/xcoff, type AuxiliaryCSect struct
+pkg debug/xcoff, type AuxiliaryCSect struct, Length int64
+pkg debug/xcoff, type AuxiliaryCSect struct, StorageMappingClass int
+pkg debug/xcoff, type AuxiliaryCSect struct, SymbolType int
+pkg debug/xcoff, type File struct
+pkg debug/xcoff, type File struct, LibraryPaths []string
+pkg debug/xcoff, type File struct, Sections []*Section
+pkg debug/xcoff, type File struct, StringTable []uint8
+pkg debug/xcoff, type File struct, Symbols []*Symbol
+pkg debug/xcoff, type File struct, embedded FileHeader
+pkg debug/xcoff, type FileHeader struct
+pkg debug/xcoff, type FileHeader struct, TargetMachine uint16
+pkg debug/xcoff, type FileHeader32 struct
+pkg debug/xcoff, type FileHeader32 struct, Fflags uint16
+pkg debug/xcoff, type FileHeader32 struct, Fmagic uint16
+pkg debug/xcoff, type FileHeader32 struct, Fnscns uint16
+pkg debug/xcoff, type FileHeader32 struct, Fnsyms int32
+pkg debug/xcoff, type FileHeader32 struct, Fopthdr uint16
+pkg debug/xcoff, type FileHeader32 struct, Fsymptr uint32
+pkg debug/xcoff, type FileHeader32 struct, Ftimedat int32
+pkg debug/xcoff, type FileHeader64 struct
+pkg debug/xcoff, type FileHeader64 struct, Fflags uint16
+pkg debug/xcoff, type FileHeader64 struct, Fmagic uint16
+pkg debug/xcoff, type FileHeader64 struct, Fnscns uint16
+pkg debug/xcoff, type FileHeader64 struct, Fnsyms int32
+pkg debug/xcoff, type FileHeader64 struct, Fopthdr uint16
+pkg debug/xcoff, type FileHeader64 struct, Fsymptr uint64
+pkg debug/xcoff, type FileHeader64 struct, Ftimedat int32
+pkg debug/xcoff, type FormatError struct
+pkg debug/xcoff, type ImportedSymbol struct
+pkg debug/xcoff, type ImportedSymbol struct, Library string
+pkg debug/xcoff, type ImportedSymbol struct, Name string
+pkg debug/xcoff, type LoaderHeader32 struct
+pkg debug/xcoff, type LoaderHeader32 struct, Limpoff uint32
+pkg debug/xcoff, type LoaderHeader32 struct, Listlen uint32
+pkg debug/xcoff, type LoaderHeader32 struct, Lnimpid int32
+pkg debug/xcoff, type LoaderHeader32 struct, Lnreloc int32
+pkg debug/xcoff, type LoaderHeader32 struct, Lnsyms int32
+pkg debug/xcoff, type LoaderHeader32 struct, Lstlen uint32
+pkg debug/xcoff, type LoaderHeader32 struct, Lstoff uint32
+pkg debug/xcoff, type LoaderHeader32 struct, Lversion int32
+pkg debug/xcoff, type LoaderHeader64 struct
+pkg debug/xcoff, type LoaderHeader64 struct, Limpoff uint64
+pkg debug/xcoff, type LoaderHeader64 struct, Listlen uint32
+pkg debug/xcoff, type LoaderHeader64 struct, Lnimpid int32
+pkg debug/xcoff, type LoaderHeader64 struct, Lnreloc int32
+pkg debug/xcoff, type LoaderHeader64 struct, Lnsyms int32
+pkg debug/xcoff, type LoaderHeader64 struct, Lrldoff uint64
+pkg debug/xcoff, type LoaderHeader64 struct, Lstlen uint32
+pkg debug/xcoff, type LoaderHeader64 struct, Lstoff uint64
+pkg debug/xcoff, type LoaderHeader64 struct, Lsymoff uint64
+pkg debug/xcoff, type LoaderHeader64 struct, Lversion int32
+pkg debug/xcoff, type LoaderSymbol32 struct
+pkg debug/xcoff, type LoaderSymbol32 struct, Lifile int32
+pkg debug/xcoff, type LoaderSymbol32 struct, Lname [8]uint8
+pkg debug/xcoff, type LoaderSymbol32 struct, Lparm uint32
+pkg debug/xcoff, type LoaderSymbol32 struct, Lscnum int16
+pkg debug/xcoff, type LoaderSymbol32 struct, Lsmclas int8
+pkg debug/xcoff, type LoaderSymbol32 struct, Lsmtype int8
+pkg debug/xcoff, type LoaderSymbol32 struct, Lvalue uint32
+pkg debug/xcoff, type LoaderSymbol64 struct
+pkg debug/xcoff, type LoaderSymbol64 struct, Lifile int32
+pkg debug/xcoff, type LoaderSymbol64 struct, Loffset uint32
+pkg debug/xcoff, type LoaderSymbol64 struct, Lparm uint32
+pkg debug/xcoff, type LoaderSymbol64 struct, Lscnum int16
+pkg debug/xcoff, type LoaderSymbol64 struct, Lsmclas int8
+pkg debug/xcoff, type LoaderSymbol64 struct, Lsmtype int8
+pkg debug/xcoff, type LoaderSymbol64 struct, Lvalue uint64
+pkg debug/xcoff, type Reloc struct
+pkg debug/xcoff, type Reloc struct, InstructionFixed bool
+pkg debug/xcoff, type Reloc struct, Length uint8
+pkg debug/xcoff, type Reloc struct, Signed bool
+pkg debug/xcoff, type Reloc struct, Symbol *Symbol
+pkg debug/xcoff, type Reloc struct, Type uint8
+pkg debug/xcoff, type Reloc struct, VirtualAddress uint64
+pkg debug/xcoff, type Reloc32 struct
+pkg debug/xcoff, type Reloc32 struct, Rsize uint8
+pkg debug/xcoff, type Reloc32 struct, Rsymndx uint32
+pkg debug/xcoff, type Reloc32 struct, Rtype uint8
+pkg debug/xcoff, type Reloc32 struct, Rvaddr uint32
+pkg debug/xcoff, type Reloc64 struct
+pkg debug/xcoff, type Reloc64 struct, Rsize uint8
+pkg debug/xcoff, type Reloc64 struct, Rsymndx uint32
+pkg debug/xcoff, type Reloc64 struct, Rtype uint8
+pkg debug/xcoff, type Reloc64 struct, Rvaddr uint64
+pkg debug/xcoff, type Section struct
+pkg debug/xcoff, type Section struct, Relocs []Reloc
+pkg debug/xcoff, type Section struct, embedded SectionHeader
+pkg debug/xcoff, type Section struct, embedded io.ReaderAt
+pkg debug/xcoff, type SectionHeader struct
+pkg debug/xcoff, type SectionHeader struct, Name string
+pkg debug/xcoff, type SectionHeader struct, Nreloc uint32
+pkg debug/xcoff, type SectionHeader struct, Relptr uint64
+pkg debug/xcoff, type SectionHeader struct, Size uint64
+pkg debug/xcoff, type SectionHeader struct, Type uint32
+pkg debug/xcoff, type SectionHeader struct, VirtualAddress uint64
+pkg debug/xcoff, type SectionHeader32 struct
+pkg debug/xcoff, type SectionHeader32 struct, Sflags uint32
+pkg debug/xcoff, type SectionHeader32 struct, Slnnoptr uint32
+pkg debug/xcoff, type SectionHeader32 struct, Sname [8]uint8
+pkg debug/xcoff, type SectionHeader32 struct, Snlnno uint16
+pkg debug/xcoff, type SectionHeader32 struct, Snreloc uint16
+pkg debug/xcoff, type SectionHeader32 struct, Spaddr uint32
+pkg debug/xcoff, type SectionHeader32 struct, Srelptr uint32
+pkg debug/xcoff, type SectionHeader32 struct, Sscnptr uint32
+pkg debug/xcoff, type SectionHeader32 struct, Ssize uint32
+pkg debug/xcoff, type SectionHeader32 struct, Svaddr uint32
+pkg debug/xcoff, type SectionHeader64 struct
+pkg debug/xcoff, type SectionHeader64 struct, Sflags uint32
+pkg debug/xcoff, type SectionHeader64 struct, Slnnoptr uint64
+pkg debug/xcoff, type SectionHeader64 struct, Sname [8]uint8
+pkg debug/xcoff, type SectionHeader64 struct, Snlnno uint32
+pkg debug/xcoff, type SectionHeader64 struct, Snreloc uint32
+pkg debug/xcoff, type SectionHeader64 struct, Spad uint32
+pkg debug/xcoff, type SectionHeader64 struct, Spaddr uint64
+pkg debug/xcoff, type SectionHeader64 struct, Srelptr uint64
+pkg debug/xcoff, type SectionHeader64 struct, Sscnptr uint64
+pkg debug/xcoff, type SectionHeader64 struct, Ssize uint64
+pkg debug/xcoff, type SectionHeader64 struct, Svaddr uint64
+pkg debug/xcoff, type SymEnt32 struct
+pkg debug/xcoff, type SymEnt32 struct, Nname [8]uint8
+pkg debug/xcoff, type SymEnt32 struct, Nnumaux int8
+pkg debug/xcoff, type SymEnt32 struct, Nsclass int8
+pkg debug/xcoff, type SymEnt32 struct, Nscnum int16
+pkg debug/xcoff, type SymEnt32 struct, Ntype uint16
+pkg debug/xcoff, type SymEnt32 struct, Nvalue uint32
+pkg debug/xcoff, type SymEnt64 struct
+pkg debug/xcoff, type SymEnt64 struct, Nnumaux int8
+pkg debug/xcoff, type SymEnt64 struct, Noffset uint32
+pkg debug/xcoff, type SymEnt64 struct, Nsclass int8
+pkg debug/xcoff, type SymEnt64 struct, Nscnum int16
+pkg debug/xcoff, type SymEnt64 struct, Ntype uint16
+pkg debug/xcoff, type SymEnt64 struct, Nvalue uint64
+pkg debug/xcoff, type Symbol struct
+pkg debug/xcoff, type Symbol struct, AuxCSect AuxiliaryCSect
+pkg debug/xcoff, type Symbol struct, Name string
+pkg debug/xcoff, type Symbol struct, SectionNumber int
+pkg debug/xcoff, type Symbol struct, StorageClass int
+pkg debug/xcoff, type Symbol struct, Value uint64
 pkg encoding/asn1, const TagNumericString = 18
 pkg encoding/asn1, const TagNumericString ideal-int
 pkg encoding/asn1, func MarshalWithParams(interface{}, string) ([]uint8, error)

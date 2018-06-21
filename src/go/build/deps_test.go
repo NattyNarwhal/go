@@ -248,6 +248,7 @@ var pkgDeps = map[string][]string{
 	"debug/macho":              {"L4", "OS", "debug/dwarf", "compress/zlib"},
 	"debug/pe":                 {"L4", "OS", "debug/dwarf", "compress/zlib"},
 	"debug/plan9obj":           {"L4", "OS"},
+	"debug/xcoff":              {"L4", "OS", "debug/dwarf"},
 	"encoding":                 {"L4"},
 	"encoding/ascii85":         {"L4"},
 	"encoding/asn1":            {"L4", "math/big"},
