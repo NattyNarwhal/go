@@ -386,6 +386,9 @@ func main() {
 // TestGdbAutotmpTypes ensures that types of autotmp variables appear in .debug_info
 // See bug #17830.
 func TestGdbAutotmpTypes(t *testing.T) {
+	if runtime.GOOS == "aix" {
+		t.Skip("This test will timeout because it is stuck inside gdb")
+	}
 	checkGdbEnvironment(t)
 	t.Parallel()
 	checkGdbVersion(t)
