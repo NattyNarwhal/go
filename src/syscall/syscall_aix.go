@@ -215,12 +215,56 @@ func Setgroups(gids []int) (err error) {
 
 //sys	accept(s int, rsa *RawSockaddrAny, addrlen *_Socklen) (fd int, err error)
 func Accept(fd int) (nfd int, sa Sockaddr, err error) {
-	panic("Accept not yet implemented")
+	var rsa RawSockaddrAny
+	var len _Socklen = SizeofSockaddrAny
+	nfd, err = accept(fd, &rsa, &len)
+	if err != nil {
+		return
+	}
+	sa, err = anyToSockaddr(&rsa)
+	if err != nil {
+		Close(nfd)
+		nfd = 0
+	}
 	return
 }
 
 func Recvmsg(fd int, p, oob []byte, flags int) (n, oobn int, recvflags int, from Sockaddr, err error) {
-	panic("Recvmsg not yet implemented")
+	var msg Msghdr
+	var rsa RawSockaddrAny
+	msg.Name = (*byte)(unsafe.Pointer(&rsa))
+	msg.Namelen = uint32(SizeofSockaddrAny)
+	var iov Iovec
+	if len(p) > 0 {
+		iov.Base = (*byte)(unsafe.Pointer(&p[0]))
+		iov.SetLen(len(p))
+	}
+	var dummy byte
+	if len(oob) > 0 {
+		var sockType int
+		sockType, err = GetsockoptInt(fd, SOL_SOCKET, SO_TYPE)
+		if err != nil {
+			return
+		}
+		// receive at least one normal byte
+		if sockType != SOCK_DGRAM && len(p) == 0 {
+			iov.Base = &dummy
+			iov.SetLen(1)
+		}
+		msg.Control = (*byte)(unsafe.Pointer(&oob[0]))
+		msg.SetControllen(len(oob))
+	}
+	msg.Iov = &iov
+	msg.Iovlen = 1
+	if n, err = recvmsg(fd, &msg, flags); err != nil {
+		return
+	}
+	oobn = int(msg.Controllen)
+	recvflags = int(msg.Flags)
+	// source address is only specified if the socket is unconnected
+	if rsa.Addr.Family != AF_UNSPEC {
+		from, err = anyToSockaddr(&rsa)
+	}
 	return
 }
 
@@ -230,12 +274,87 @@ func Sendmsg(fd int, p, oob []byte, to Sockaddr, flags int) (err error) {
 }
 
 func SendmsgN(fd int, p, oob []byte, to Sockaddr, flags int) (n int, err error) {
-	panic("SendmsgN not yet implemented")
+	var ptr unsafe.Pointer
+	var salen _Socklen
+	if to != nil {
+		ptr, salen, err = to.sockaddr()
+		if err != nil {
+			return 0, err
+		}
+	}
+	var msg Msghdr
+	msg.Name = (*byte)(unsafe.Pointer(ptr))
+	msg.Namelen = uint32(salen)
+	var iov Iovec
+	if len(p) > 0 {
+		iov.Base = (*byte)(unsafe.Pointer(&p[0]))
+		iov.SetLen(len(p))
+	}
+	var dummy byte
+	if len(oob) > 0 {
+		var sockType int
+		sockType, err = GetsockoptInt(fd, SOL_SOCKET, SO_TYPE)
+		if err != nil {
+			return 0, err
+		}
+		// send at least one normal byte
+		if sockType != SOCK_DGRAM && len(p) == 0 {
+			iov.Base = &dummy
+			iov.SetLen(1)
+		}
+		msg.Control = (*byte)(unsafe.Pointer(&oob[0]))
+		msg.SetControllen(len(oob))
+	}
+	msg.Iov = &iov
+	msg.Iovlen = 1
+	if n, err = sendmsg(fd, &msg, flags); err != nil {
+		return 0, err
+	}
+	if len(oob) > 0 && len(p) == 0 {
+		n = 0
+	}
 	return n, nil
 }
 
 func anyToSockaddr(rsa *RawSockaddrAny) (Sockaddr, error) {
-	panic("anyToSockaddr not yet implemented")
+	switch rsa.Addr.Family {
+	case AF_UNIX:
+		pp := (*RawSockaddrUnix)(unsafe.Pointer(rsa))
+		sa := new(SockaddrUnix)
+		// Assume path ends at NUL.
+		// This is not technically the Linux semantics for
+		// abstract Unix domain sockets--they are supposed
+		// to be uninterpreted fixed-size binary blobs--but
+		// everyone uses this convention.
+		n := 0
+		for n < len(pp.Path) && pp.Path[n] != 0 {
+			n++
+		}
+		bytes := (*[len(pp.Path)]byte)(unsafe.Pointer(&pp.Path[0]))
+		sa.Name = string(bytes[0:n])
+		return sa, nil
+
+	case AF_INET:
+		pp := (*RawSockaddrInet4)(unsafe.Pointer(rsa))
+		sa := new(SockaddrInet4)
+		p := (*[2]byte)(unsafe.Pointer(&pp.Port))
+		sa.Port = int(p[0])<<8 + int(p[1])
+		for i := 0; i < len(sa.Addr); i++ {
+			sa.Addr[i] = pp.Addr[i]
+		}
+		return sa, nil
+
+	case AF_INET6:
+		pp := (*RawSockaddrInet6)(unsafe.Pointer(rsa))
+		sa := new(SockaddrInet6)
+		p := (*[2]byte)(unsafe.Pointer(&pp.Port))
+		sa.Port = int(p[0])<<8 + int(p[1])
+		for i := 0; i < len(sa.Addr); i++ {
+			sa.Addr[i] = pp.Addr[i]
+		}
+		return sa, nil
+	}
+	return nil, EAFNOSUPPORT
 }
 
 func direntIno(buf []byte) (uint64, bool) {
