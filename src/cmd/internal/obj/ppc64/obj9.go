@@ -498,6 +498,28 @@ func preprocess(ctxt *obj.Link, cursym *obj.LSym, newprog obj.ProgAlloc) {
 				rel.Type = objabi.R_ADDRPOWER_PCREL
 			}
 
+			// Aix must save LR in the stack before calling morestack
+			if c.ctxt.Headtype == objabi.Haix && autosize != 0 && c.cursym.Name != "runtime.racecallbackthunk" {
+				// MOVD LR, R31
+				q = obj.Appendp(q, c.newprog)
+				q.As = AMOVD
+				q.Pos = p.Pos
+				q.From.Type = obj.TYPE_REG
+				q.From.Reg = REG_LR
+				q.To.Type = obj.TYPE_REG
+				q.To.Reg = REGTMP
+
+				// MOVD R31, 16(R1)
+				q = obj.Appendp(q, c.newprog)
+				q.As = AMOVD
+				q.Pos = p.Pos
+				q.From.Type = obj.TYPE_REG
+				q.From.Reg = REGTMP
+				q.To.Type = obj.TYPE_MEM
+				q.To.Offset = 16
+				q.To.Reg = REGSP
+			}
+
 			if !c.cursym.Func.Text.From.Sym.NoSplit() {
 				q = c.stacksplit(q, autosize) // emit split check
 			}
@@ -511,45 +533,73 @@ func preprocess(ctxt *obj.Link, cursym *obj.LSym, newprog obj.ProgAlloc) {
 				// even for non-empty leaf functions so that traceback works.
 				if autosize >= -BIG && autosize <= BIG {
 					// Use MOVDU to adjust R1 when saving R31, if autosize is small.
-					q = obj.Appendp(q, c.newprog)
-					q.As = AMOVD
-					q.Pos = p.Pos
-					q.From.Type = obj.TYPE_REG
-					q.From.Reg = REG_LR
-					q.To.Type = obj.TYPE_REG
-					q.To.Reg = REGTMP
+					// Aix stack is slightly different as we need to save
+					// the current frame pointer in the next frame
+					// LR is already saved before stacksplit's assembly
+					if c.ctxt.Headtype == objabi.Haix {
 
-					q = obj.Appendp(q, c.newprog)
-					q.As = AMOVDU
-					q.Pos = p.Pos
-					q.From.Type = obj.TYPE_REG
-					q.From.Reg = REGTMP
-					q.To.Type = obj.TYPE_MEM
-					q.To.Offset = int64(-autosize)
-					q.To.Reg = REGSP
-					q.Spadj = autosize
+						q = obj.Appendp(q, c.newprog)
+						q.As = AMOVDU
+						q.Pos = p.Pos
+						q.From.Type = obj.TYPE_REG
+						q.From.Reg = REGSP
+						q.To.Type = obj.TYPE_MEM
+						q.To.Offset = int64(-autosize)
+						q.To.Reg = REGSP
+						q.Spadj = int32(autosize)
+					} else {
+						q = obj.Appendp(q, c.newprog)
+						q.As = AMOVD
+						q.Pos = p.Pos
+						q.From.Type = obj.TYPE_REG
+						q.From.Reg = REG_LR
+						q.To.Type = obj.TYPE_REG
+						q.To.Reg = REGTMP
+
+						q = obj.Appendp(q, c.newprog)
+						q.As = AMOVDU
+						q.Pos = p.Pos
+						q.From.Type = obj.TYPE_REG
+						q.From.Reg = REGTMP
+						q.To.Type = obj.TYPE_MEM
+						q.To.Offset = int64(-autosize)
+						q.To.Reg = REGSP
+						q.Spadj = autosize
+					}
 				} else {
 					// Frame size is too large for a MOVDU instruction.
 					// Store link register before decrementing SP, so if a signal comes
 					// during the execution of the function prologue, the traceback
 					// code will not see a half-updated stack frame.
-					q = obj.Appendp(q, c.newprog)
-					q.As = AMOVD
-					q.Pos = p.Pos
-					q.From.Type = obj.TYPE_REG
-					q.From.Reg = REG_LR
-					q.To.Type = obj.TYPE_REG
-					q.To.Reg = REG_R29 // REGTMP may be used to synthesize large offset in the next instruction
+					if c.ctxt.Headtype == objabi.Haix {
+						q = obj.Appendp(q, c.newprog)
+						q.As = AMOVD
+						q.Pos = p.Pos
+						q.From.Type = obj.TYPE_REG
+						q.From.Reg = REGTMP
+						q.To.Type = obj.TYPE_MEM
+						q.To.Offset = int64(-autosize)
+						q.To.Reg = REGSP
 
-					q = obj.Appendp(q, c.newprog)
-					q.As = AMOVD
-					q.Pos = p.Pos
-					q.From.Type = obj.TYPE_REG
-					q.From.Reg = REG_R29
-					q.To.Type = obj.TYPE_MEM
-					q.To.Offset = int64(-autosize)
-					q.To.Reg = REGSP
+					} else {
+						q = obj.Appendp(q, c.newprog)
+						q.As = AMOVD
+						q.Pos = p.Pos
+						q.From.Type = obj.TYPE_REG
+						q.From.Reg = REG_LR
+						q.To.Type = obj.TYPE_REG
+						q.To.Reg = REG_R29 // REGTMP may be used to synthesize large offset in the next instruction
 
+						q = obj.Appendp(q, c.newprog)
+						q.As = AMOVD
+						q.Pos = p.Pos
+						q.From.Type = obj.TYPE_REG
+						q.From.Reg = REG_R29
+						q.To.Type = obj.TYPE_MEM
+						q.To.Offset = int64(-autosize)
+						q.To.Reg = REGSP
+
+					}
 					q = obj.Appendp(q, c.newprog)
 					q.As = AADD
 					q.Pos = p.Pos
@@ -715,9 +765,29 @@ func preprocess(ctxt *obj.Link, cursym *obj.LSym, newprog obj.ProgAlloc) {
 				break
 			}
 
+			// First restore stack pointer
+			if c.ctxt.Headtype == objabi.Haix && autosize != 0 && c.cursym.Name != "runtime.racecallbackthunk" {
+				p.As = AADD
+				p.Pos = p.Pos
+				p.From.Type = obj.TYPE_CONST
+				p.From.Offset = int64(autosize)
+				p.To.Type = obj.TYPE_REG
+				p.To.Reg = REGSP
+				p.Spadj = -autosize
+
+				q = c.newprog()
+				q.Pos = p.Pos
+				q.Link = p.Link
+				p.Link = q
+				p = q
+			}
+
 			p.As = AMOVD
 			p.From.Type = obj.TYPE_MEM
 			p.From.Offset = 0
+			if c.ctxt.Headtype == objabi.Haix {
+				p.From.Offset += 16
+			}
 			p.From.Reg = REGSP
 			p.To.Type = obj.TYPE_REG
 			p.To.Reg = REGTMP
@@ -751,7 +821,7 @@ func preprocess(ctxt *obj.Link, cursym *obj.LSym, newprog obj.ProgAlloc) {
 				p = q
 			}
 			prev := p
-			if autosize != 0 && c.cursym.Name != "runtime.racecallbackthunk" {
+			if c.ctxt.Headtype != objabi.Haix && autosize != 0 && c.cursym.Name != "runtime.racecallbackthunk" {
 				q = c.newprog()
 				q.As = AADD
 				q.Pos = p.Pos
@@ -796,6 +866,19 @@ func preprocess(ctxt *obj.Link, cursym *obj.LSym, newprog obj.ProgAlloc) {
 				p.As = AMOVD
 				p.From.Type = obj.TYPE_MEM
 				p.From.Reg = REGSP
+
+				if c.ctxt.Headtype == objabi.Haix {
+					// LR is in the previous frame
+					/* MOVD 16(Rd), Rd */
+					p0 := p  // Save to retrieve Rd
+					p = obj.Appendp(p, c.newprog)
+					p.As = AMOVD
+					p.From.Type = obj.TYPE_MEM
+					p.From.Reg = p0.To.Reg 
+					p.From.Offset = 16
+					p.To.Type = obj.TYPE_REG
+					p.To.Reg = p0.To.Reg
+				}
 			}
 		}
 	}

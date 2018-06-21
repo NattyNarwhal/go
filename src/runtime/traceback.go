@@ -155,7 +155,11 @@ func gentraceback(pc0, sp0, lr0 uintptr, gp *g, skip int, pcbuf *uintptr, max in
 	// Start in the caller's frame.
 	if frame.pc == 0 {
 		if usesLR {
-			frame.pc = *(*uintptr)(unsafe.Pointer(frame.sp))
+			if GOOS == "aix" {
+				frame.pc = *(*uintptr)(unsafe.Pointer(frame.sp + 16))
+			} else {
+				frame.pc = *(*uintptr)(unsafe.Pointer(frame.sp))
+			}
 			frame.lr = 0
 		} else {
 			frame.pc = uintptr(*(*sys.Uintreg)(unsafe.Pointer(frame.sp)))
@@ -230,7 +234,12 @@ func gentraceback(pc0, sp0, lr0 uintptr, gp *g, skip int, pcbuf *uintptr, max in
 			var lrPtr uintptr
 			if usesLR {
 				if n == 0 && frame.sp < frame.fp || frame.lr == 0 {
-					lrPtr = frame.sp
+					// LR is stored in the previous stack
+					if GOOS == "aix" {
+						lrPtr = frame.fp + 16
+					} else {
+						lrPtr = frame.sp
+					}
 					frame.lr = *(*uintptr)(unsafe.Pointer(lrPtr))
 				}
 			} else {

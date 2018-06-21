@@ -36,7 +36,11 @@ func badLR2(arg int) {
 	// Smash the return PC or saved LR.
 	lrOff := unsafe.Sizeof(uintptr(0))
 	if runtime.GOARCH == "ppc64" || runtime.GOARCH == "ppc64le" {
-		lrOff = 32 // FIXED_FRAME or sys.MinFrameSize
+		if runtime.GOOS == "aix" {
+			lrOff = 16
+		} else {
+			lrOff = 32 // FIXED_FRAME or sys.MinFrameSize
+		}
 	}
 	lrPtr := (*uintptr)(unsafe.Pointer(uintptr(unsafe.Pointer(&arg)) - lrOff))
 	*lrPtr = 0xbad

@@ -656,6 +656,11 @@ func adjustframe(frame *stkframe, arg unsafe.Pointer) bool {
 		adjustpointer(adjinfo, unsafe.Pointer(frame.varp))
 	}
 
+	// Adjust framepointer
+	if GOOS == "aix" {
+		adjustpointer(adjinfo, unsafe.Pointer(frame.sp))
+	}
+
 	// Adjust arguments.
 	if args.n > 0 {
 		if stackDebug >= 3 {
