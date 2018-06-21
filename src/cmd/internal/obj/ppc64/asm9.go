@@ -260,6 +260,12 @@ var optab = []Optab{
 	{AMOVBZ, C_REG, C_NONE, C_NONE, C_ADDR, 74, 8, 0},
 	{AMOVB, C_REG, C_NONE, C_NONE, C_ADDR, 74, 8, 0},
 
+	{AMOVD, C_REG, C_NONE, C_NONE, C_DADDR, 96, 16, 0},
+	{AMOVW, C_REG, C_NONE, C_NONE, C_DADDR, 96, 16, 0},
+	{AMOVWZ, C_REG, C_NONE, C_NONE, C_DADDR, 96, 16, 0},
+	{AMOVBZ, C_REG, C_NONE, C_NONE, C_DADDR, 96, 16, 0},
+	{AMOVB, C_REG, C_NONE, C_NONE, C_DADDR, 96, 16, 0},
+
 	/* load, long offset */
 	{AMOVD, C_LEXT, C_NONE, C_NONE, C_REG, 36, 8, REGSB},
 	{AMOVW, C_LEXT, C_NONE, C_NONE, C_REG, 36, 8, REGSB},
@@ -281,6 +287,12 @@ var optab = []Optab{
 	{AMOVWZ, C_ADDR, C_NONE, C_NONE, C_REG, 75, 8, 0},
 	{AMOVBZ, C_ADDR, C_NONE, C_NONE, C_REG, 75, 8, 0},
 	{AMOVB, C_ADDR, C_NONE, C_NONE, C_REG, 76, 12, 0},
+
+	{AMOVD, C_DADDR, C_NONE, C_NONE, C_REG, 97, 16, 0},
+	{AMOVW, C_DADDR, C_NONE, C_NONE, C_REG, 97, 16, 0},
+	{AMOVWZ, C_DADDR, C_NONE, C_NONE, C_REG, 97, 16, 0},
+	{AMOVBZ, C_DADDR, C_NONE, C_NONE, C_REG, 97, 16, 0},
+	{AMOVB, C_DADDR, C_NONE, C_NONE, C_REG, 98, 20, 0},
 
 	{AMOVD, C_TLS_LE, C_NONE, C_NONE, C_REG, 79, 4, 0},
 	{AMOVD, C_TLS_IE, C_NONE, C_NONE, C_REG, 80, 8, 0},
@@ -310,10 +322,13 @@ var optab = []Optab{
 	/* load unsigned/long constants (TO DO: check) */
 	{AMOVD, C_UCON, C_NONE, C_NONE, C_REG, 3, 4, REGZERO},
 	{AMOVD, C_LCON, C_NONE, C_NONE, C_REG, 19, 8, 0},
+	{AMOVD, C_DCON, C_NONE, C_NONE, C_REG, 95, 16, 0},
 	{AMOVW, C_UCON, C_NONE, C_NONE, C_REG, 3, 4, REGZERO},
 	{AMOVW, C_LCON, C_NONE, C_NONE, C_REG, 19, 8, 0},
+	{AMOVW, C_DCON, C_NONE, C_NONE, C_REG, 95, 16, 0},
 	{AMOVWZ, C_UCON, C_NONE, C_NONE, C_REG, 3, 4, REGZERO},
 	{AMOVWZ, C_LCON, C_NONE, C_NONE, C_REG, 19, 8, 0},
+	{AMOVWZ, C_DCON, C_NONE, C_NONE, C_REG, 95, 16, 0},
 	{AMOVHBR, C_ZOREG, C_REG, C_NONE, C_REG, 45, 4, 0},
 	{AMOVHBR, C_ZOREG, C_NONE, C_NONE, C_REG, 45, 4, 0},
 	{AMOVHBR, C_REG, C_REG, C_NONE, C_ZOREG, 44, 4, 0},
@@ -343,6 +358,7 @@ var optab = []Optab{
 	{AFMOVD, C_LAUTO, C_NONE, C_NONE, C_FREG, 36, 8, REGSP},
 	{AFMOVD, C_LOREG, C_NONE, C_NONE, C_FREG, 36, 8, REGZERO},
 	{AFMOVD, C_ADDR, C_NONE, C_NONE, C_FREG, 75, 8, 0},
+	{AFMOVD, C_DADDR, C_NONE, C_NONE, C_FREG, 97, 16, 0},
 	{AFMOVD, C_FREG, C_NONE, C_NONE, C_SEXT, 7, 4, REGSB},
 	{AFMOVD, C_FREG, C_NONE, C_NONE, C_SAUTO, 7, 4, REGSP},
 	{AFMOVD, C_FREG, C_NONE, C_NONE, C_SOREG, 7, 4, REGZERO},
@@ -350,6 +366,7 @@ var optab = []Optab{
 	{AFMOVD, C_FREG, C_NONE, C_NONE, C_LAUTO, 35, 8, REGSP},
 	{AFMOVD, C_FREG, C_NONE, C_NONE, C_LOREG, 35, 8, REGZERO},
 	{AFMOVD, C_FREG, C_NONE, C_NONE, C_ADDR, 74, 8, 0},
+	{AFMOVD, C_FREG, C_NONE, C_NONE, C_DADDR, 96, 16, 0},
 	{AFMOVSX, C_ZOREG, C_REG, C_NONE, C_FREG, 45, 4, 0},
 	{AFMOVSX, C_ZOREG, C_NONE, C_NONE, C_FREG, 45, 4, 0},
 	{AFMOVSX, C_FREG, C_REG, C_NONE, C_ZOREG, 44, 4, 0},
@@ -596,6 +613,7 @@ var optab = []Optab{
 	{obj.AUNDEF, C_NONE, C_NONE, C_NONE, C_NONE, 78, 4, 0},
 	{obj.APCDATA, C_LCON, C_NONE, C_NONE, C_LCON, 0, 0, 0},
 	{obj.AFUNCDATA, C_SCON, C_NONE, C_NONE, C_ADDR, 0, 0, 0},
+	{obj.AFUNCDATA, C_SCON, C_NONE, C_NONE, C_DADDR, 0, 0, 0},
 	{obj.ANOP, C_NONE, C_NONE, C_NONE, C_NONE, 0, 0, 0},
 	{obj.ADUFFZERO, C_NONE, C_NONE, C_NONE, C_LBRA, 11, 4, 0}, // same as ABR/ABL
 	{obj.ADUFFCOPY, C_NONE, C_NONE, C_NONE, C_LBRA, 11, 4, 0}, // same as ABR/ABL
@@ -792,6 +810,10 @@ func (c *ctxt9) aclass(a *obj.Addr) int {
 						return C_TLS_LE
 					}
 				}
+				if c.ctxt.Headtype == objabi.Haix {
+					// Aix address are on 64 bits
+					return C_DADDR
+				}
 				return C_ADDR
 			}
 			return C_LEXT
@@ -854,6 +876,10 @@ func (c *ctxt9) aclass(a *obj.Addr) int {
 			c.instoffset = a.Offset
 
 			/* not sure why this barfs */
+			if c.ctxt.Headtype == objabi.Haix {
+				// Aix symbol are on 64 bits
+				return C_DCON
+			}
 			return C_LCON
 
 		case obj.NAME_AUTO:
@@ -960,7 +986,7 @@ func (c *ctxt9) oplook(p *obj.Prog) *Optab {
 		}
 	}
 
-	//print("oplook %v %d %d %d %d\n", p, a1, a2, a3, a4);
+	// c.ctxt.Logf("oplook %v %d %d %d %d\n", p, a1, a2, a3, a4)
 	ops := oprange[p.As&obj.AMask]
 	c1 := &xcmp[a1]
 	c3 := &xcmp[a3]
@@ -2146,7 +2172,7 @@ func (c *ctxt9) opform(insn uint32) int {
 
 // Encode instructions and create relocation for accessing s+d according to the
 // instruction op with source or destination (as appropriate) register reg.
-func (c *ctxt9) symbolAccess(s *obj.LSym, d int64, reg int16, op uint32) (o1, o2 uint32) {
+func (c *ctxt9) symbolAccessLinux(s *obj.LSym, d int64, reg int16, op uint32) (o1, o2 uint32) {
 	var base uint32
 	form := c.opform(op)
 	if c.ctxt.Flag_shared {
@@ -2176,6 +2202,39 @@ func (c *ctxt9) symbolAccess(s *obj.LSym, d int64, reg int16, op uint32) (o1, o2
 		case DS_FORM:
 			rel.Type = objabi.R_ADDRPOWER_DS
 		}
+	}
+	return
+}
+
+// Encode instructions and create relocation for accessing s+d according to the
+// instruction op with source or destination (as appropriate) register reg
+// This version is only to access symbols on AIX, which are on 64 bits addresses
+// It needs two more instructions to get higher bits and put them in REGTMP
+// TODO(aix): Fix symbol access in case of a data symbol. Currently, this is fixed in link
+func (c *ctxt9) symbolAccessAix(s *obj.LSym, d int64, reg int16, op uint32) (o1, o2, o3, o4 uint32) {
+	var base uint32
+	form := c.opform(op)
+	base = REG_R0
+	o1 = AOP_IRR(OP_ADDI, REGTMP, base, 0)
+	rel := obj.Addrel(c.cursym)
+	rel.Off = int32(c.pc + 2)
+	rel.Siz = 2
+	rel.Sym = s
+	rel.Add = d
+	rel.Type = objabi.R_ADDRPOWER_64REL
+	o2 = AOP_RLDIC(OP_RLDICL, REGTMP, REGTMP, 32, 0) // shift
+	o3 = AOP_IRR(OP_ORIS, REGTMP, REGTMP, 0)
+	o4 = AOP_IRR(op, uint32(reg), REGTMP, 0)
+	rel = obj.Addrel(c.cursym)
+	rel.Off = int32(c.pc + 8)
+	rel.Siz = 8
+	rel.Sym = s
+	rel.Add = d
+	switch form {
+	case D_FORM:
+		rel.Type = objabi.R_ADDRPOWER
+	case DS_FORM:
+		rel.Type = objabi.R_ADDRPOWER_DS
 	}
 	return
 }
@@ -2692,12 +2751,11 @@ func (c *ctxt9) asmout(p *obj.Prog, o *Optab, out []uint32) {
 
 	case 19: /* mov $lcon,r ==> cau+or */
 		d := c.vregoff(&p.From)
-
 		if p.From.Sym == nil {
 			o1 = loadu32(int(p.To.Reg), d)
 			o2 = LOP_IRR(OP_ORI, uint32(p.To.Reg), uint32(p.To.Reg), uint32(int32(d)))
 		} else {
-			o1, o2 = c.symbolAccess(p.From.Sym, d, p.To.Reg, OP_ADDI)
+			o1, o2 = c.symbolAccessLinux(p.From.Sym, d, p.To.Reg, OP_ADDI)
 		}
 
 	case 20: /* add $ucon,,r | addis $addcon,r,r */
@@ -3337,7 +3395,8 @@ func (c *ctxt9) asmout(p *obj.Prog, o *Optab, out []uint32) {
 		if c.opform(inst) == DS_FORM && v&0x3 != 0 {
 			log.Fatalf("invalid offset for DS form load/store %v", p)
 		}
-		o1, o2 = c.symbolAccess(p.To.Sym, v, p.From.Reg, inst)
+
+		o1, o2 = c.symbolAccessLinux(p.To.Sym, v, p.From.Reg, inst)
 
 	//if(dlm) reloc(&p->to, p->pc, 1);
 
@@ -3348,7 +3407,7 @@ func (c *ctxt9) asmout(p *obj.Prog, o *Optab, out []uint32) {
 		if c.opform(inst) == DS_FORM && v&0x3 != 0 {
 			log.Fatalf("invalid offset for DS form load/store %v", p)
 		}
-		o1, o2 = c.symbolAccess(p.From.Sym, v, p.To.Reg, inst)
+		o1, o2 = c.symbolAccessLinux(p.From.Sym, v, p.To.Reg, inst)
 
 	//if(dlm) reloc(&p->from, p->pc, 1);
 
@@ -3359,7 +3418,7 @@ func (c *ctxt9) asmout(p *obj.Prog, o *Optab, out []uint32) {
 		if c.opform(inst) == DS_FORM && v&0x3 != 0 {
 			log.Fatalf("invalid offset for DS form load/store %v", p)
 		}
-		o1, o2 = c.symbolAccess(p.From.Sym, v, p.To.Reg, inst)
+		o1, o2 = c.symbolAccessLinux(p.From.Sym, v, p.To.Reg, inst)
 		o3 = LOP_RRR(OP_EXTSB, uint32(p.To.Reg), uint32(p.To.Reg), 0)
 
 		//if(dlm) reloc(&p->from, p->pc, 1);
@@ -3567,6 +3626,44 @@ func (c *ctxt9) asmout(p *obj.Prog, o *Optab, out []uint32) {
 		/* operand order: RA, RB, CY, RT */
 		cy := int(c.regoff(p.GetFrom3()))
 		o1 = AOP_Z23I(c.oprrr(p.As), uint32(p.To.Reg), uint32(p.From.Reg), uint32(p.Reg), uint32(cy))
+
+	case 95: /* mov $dcon,r ==> cal+rldicl+oris+op */
+		d := c.vregoff(&p.From)
+		if p.From.Sym == nil {
+			c.ctxt.Diag("mov $dcon, r is not yet available when p.From.Sym == nil")
+		} else {
+			o1, o2, o3, o4 = c.symbolAccessAix(p.From.Sym, d, p.To.Reg, OP_ADDI)
+		}
+
+	/* AIX relocation operations */
+	case 96:
+		v := c.vregoff(&p.To)
+		// Offsets in DS form stores must be a multiple of 4
+		inst := c.opstore(p.As)
+		if c.opform(inst) == DS_FORM && v&0x3 != 0 {
+			log.Fatalf("invalid offset for DS form load/store %v", p)
+		}
+		o1, o2, o3, o4 = c.symbolAccessAix(p.To.Sym, v, p.From.Reg, inst)
+
+	case 97:
+		v := c.vregoff(&p.From)
+		// Offsets in DS form loads must be a multiple of 4
+		inst := c.opload(p.As)
+		if c.opform(inst) == DS_FORM && v&0x3 != 0 {
+			log.Fatalf("invalid offset for DS form load/store %v", p)
+		}
+		o1, o2, o3, o4 = c.symbolAccessAix(p.From.Sym, v, p.To.Reg, inst)
+
+	case 98:
+		v := c.vregoff(&p.From)
+		// Offsets in DS form loads must be a multiple of 4
+		inst := c.opload(p.As)
+		if c.opform(inst) == DS_FORM && v&0x3 != 0 {
+			log.Fatalf("invalid offset for DS form load/store %v", p)
+		}
+		o1, o2, o3, o4 = c.symbolAccessAix(p.From.Sym, v, p.To.Reg, inst)
+		o5 = LOP_RRR(OP_EXTSB, uint32(p.To.Reg), uint32(p.To.Reg), 0)
+
 	}
 
 	out[0] = o1

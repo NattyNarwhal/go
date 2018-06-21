@@ -196,6 +196,11 @@ const (
 
 	// R_WASMIMPORT resolves to the index of the WebAssembly function import.
 	R_WASMIMPORT
+
+	// R_ADDRPOWER_64REL (only used on Aix/ppc64) allows to relocate addresses >= 2G on powerpc.
+	// This relocation is linked with R_ADDRPOWER* and is applied to the
+	// bits 47-32 of a 64bits address.
+	R_ADDRPOWER_64REL
 )
 
 // IsDirectJump returns whether r is a relocation for a direct jump.

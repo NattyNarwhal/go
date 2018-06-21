@@ -164,7 +164,7 @@ func relocsym(ctxt *Link, s *sym.Symbol) {
 		// We need to be able to reference dynimport symbols when linking against
 		// shared libraries, and Solaris and Darwin need it always
 		if ctxt.HeadType != objabi.Hsolaris && ctxt.HeadType != objabi.Hdarwin && r.Sym != nil && r.Sym.Type == sym.SDYNIMPORT && !ctxt.DynlinkingGo() && !r.Sym.Attr.SubSymbol() {
-			if !(ctxt.Arch.Family == sys.PPC64 && ctxt.LinkMode == LinkExternal && r.Sym.Name == ".TOC.") && !(ctxt.IsAix && r.Sym.Type == sym.SDYNIMPORT && r.Type == objabi.R_ADDRPOWER) {
+			if !(ctxt.Arch.Family == sys.PPC64 && ctxt.LinkMode == LinkExternal && r.Sym.Name == ".TOC.") && !(ctxt.IsAix && r.Sym.Type == sym.SDYNIMPORT && (r.Type == objabi.R_ADDRPOWER || r.Type == objabi.R_ADDRPOWER_64REL)) {
 				Errorf(s, "unhandled relocation for %s (type %d (%s) rtype %d (%s))", r.Sym.Name, r.Sym.Type, r.Sym.Type, r.Type, sym.RelocName(ctxt.Arch, r.Type))
 			}
 		}

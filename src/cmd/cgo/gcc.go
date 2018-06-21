@@ -13,6 +13,7 @@ import (
 	"debug/elf"
 	"debug/macho"
 	"debug/pe"
+	"debug/xcoff"
 	"encoding/binary"
 	"errors"
 	"flag"
@@ -1377,6 +1378,9 @@ func (p *Package) gccCmd() []string {
 
 	c = append(c, p.GccOptions...)
 	c = append(c, p.gccMachine()...)
+	if goos == "aix" {
+		c = append(c, "-maix64")
+	}
 	c = append(c, "-") //read input from standard input
 	return c
 }
@@ -1663,7 +1667,85 @@ func (p *Package) gccDebug(stdin []byte, nnames int) (d *dwarf.Data, ints []int6
 		return d, ints, floats, strs
 	}
 
-	fatalf("cannot parse gcc output %s as ELF, Mach-O, PE object", gccTmp())
+	if f, err := xcoff.Open(gccTmp()); err == nil {
+		defer f.Close()
+		d, err := f.DWARF()
+		if err != nil {
+			fatalf("cannot load DWARF output from %s: %v", gccTmp(), err)
+		}
+		bo := binary.BigEndian
+		for _, s := range f.Symbols {
+			switch {
+			case isDebugInts(s.Name):
+				// Found it. Now find data section.
+				if i := int(s.SectionNumber); 0 <= i && i < len(f.Sections) {
+					sect := f.Sections[i]
+					shdr := sect.SectionHeader
+					if shdr.VirtualAddress <= s.Value && s.Value < shdr.VirtualAddress+shdr.Size {
+						if sdat, err := sect.Data(); err == nil {
+							data := sdat[s.Value-shdr.VirtualAddress:]
+							ints = make([]int64, len(data)/8)
+							for i := range ints {
+								ints[i] = int64(bo.Uint64(data[i*8:]))
+							}
+						}
+					}
+				}
+			case isDebugFloats(s.Name):
+				// Found it. Now find data section.
+				if i := int(s.SectionNumber); 0 <= i && i < len(f.Sections) {
+					sect := f.Sections[i]
+					shdr := sect.SectionHeader
+					if shdr.VirtualAddress <= s.Value && s.Value < shdr.VirtualAddress+sect.Size {
+						if sdat, err := sect.Data(); err == nil {
+							data := sdat[s.Value-shdr.VirtualAddress:]
+							floats = make([]float64, len(data)/8)
+							for i := range floats {
+								floats[i] = math.Float64frombits(bo.Uint64(data[i*8:]))
+							}
+						}
+					}
+				}
+			default:
+				if n := indexOfDebugStr(s.Name); n != -1 {
+					// Found it. Now find data section.
+					if i := int(s.SectionNumber); 0 <= i && i < len(f.Sections) {
+						sect := f.Sections[i]
+						shdr := sect.SectionHeader
+						if shdr.VirtualAddress <= s.Value && s.Value < shdr.VirtualAddress+sect.Size {
+							if sdat, err := sect.Data(); err == nil {
+								data := sdat[s.Value-shdr.VirtualAddress:]
+								strdata[n] = string(data)
+							}
+						}
+					}
+					break
+				}
+				if n := indexOfDebugStrlen(s.Name); n != -1 {
+					// Found it. Now find data section.
+					if i := int(s.SectionNumber); 0 <= i && i < len(f.Sections) {
+						sect := f.Sections[i]
+						shdr := sect.SectionHeader
+						if shdr.VirtualAddress <= s.Value && s.Value < shdr.VirtualAddress+sect.Size {
+							if sdat, err := sect.Data(); err == nil {
+								data := sdat[s.Value-shdr.VirtualAddress:]
+								strlen := bo.Uint64(data[:8])
+								if strlen > (1<<(uint(p.IntSize*8)-1) - 1) { // greater than MaxInt?
+									fatalf("string literal too big")
+								}
+								strlens[n] = int(strlen)
+							}
+						}
+					}
+					break
+				}
+			}
+		}
+
+		buildStrings()
+		return d, ints, floats, strs
+	}
+	fatalf("cannot parse gcc output %s as ELF, Mach-O, PE, Xcoff object", gccTmp())
 	panic("not reached")
 }
 
