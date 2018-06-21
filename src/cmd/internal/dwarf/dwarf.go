@@ -186,6 +186,7 @@ type Context interface {
 	AddString(s Sym, v string)
 	AddFileRef(s Sym, f interface{})
 	Logf(format string, args ...interface{})
+	IsDwarf64() bool
 }
 
 // AppendUleb128 appends v to b using DWARF's unsigned LEB128 encoding.
@@ -919,7 +920,11 @@ func putattr(ctxt Context, s Sym, abbrev int, form int, cls int, value int64, da
 		if data == nil {
 			return fmt.Errorf("dwarf: null reference in %d", abbrev)
 		}
-		ctxt.AddDWARFSectionOffset(s, 4, data, value)
+		if ctxt.IsDwarf64() {
+			ctxt.AddDWARFSectionOffset(s, 8, data, value)
+		} else {
+			ctxt.AddDWARFSectionOffset(s, 4, data, value)
+		}
 
 	case DW_FORM_ref1, // reference within the compilation unit
 		DW_FORM_ref2,      // reference

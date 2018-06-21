@@ -479,6 +479,10 @@ func (c dwCtxt) CurrentOffset(s dwarf.Sym) int64 {
 	return ls.Size
 }
 
+func (c dwCtxt) IsDwarf64() bool {
+	return c.Link.Headtype == objabi.Haix
+}
+
 // Here "from" is a symbol corresponding to an inlined or concrete
 // function, "to" is the symbol for the corresponding abstract
 // function, and "dclIdx" is the index of the symbol of interest with
