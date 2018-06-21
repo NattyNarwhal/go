@@ -114,6 +114,13 @@ func (p *noder) pragcgo(pos syntax.Pos, text string) {
 		case len(f) == 3 && !isQuoted(f[1]) && !isQuoted(f[2]):
 		case len(f) == 4 && !isQuoted(f[1]) && !isQuoted(f[2]) && isQuoted(f[3]):
 			f[3] = strings.Trim(f[3], `"`)
+			if objabi.GOOS == "aix" {
+				// On Aix, library pattern must be "lib.a/object.o"
+				n := strings.Split(f[3], "/")
+				if len(n) != 2 || n[0][len(n[0])-2:] != ".a" || n[1][len(n[1])-2:] != ".o" {
+					p.error(syntax.Error{Pos: pos, Msg: `usage: //go:cgo_import_dynamic local [remote ["lib.a/object.o"]]`})
+				}
+			}
 		default:
 			p.error(syntax.Error{Pos: pos, Msg: `usage: //go:cgo_import_dynamic local [remote ["library"]]`})
 			return
