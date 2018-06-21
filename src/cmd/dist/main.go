@@ -81,6 +81,9 @@ func main() {
 		}
 	case "windows":
 		exe = ".exe"
+	case "aix":
+		// uname -m doesn't work under aix
+		gohostarch = "ppc64"
 	}
 
 	sysinit()
