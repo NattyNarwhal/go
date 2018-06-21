@@ -229,43 +229,26 @@ func exit(code int32) {
 
 //go:nosplit
 func write(fd uintptr, p unsafe.Pointer, n int32) int32 {
-	r, err := syscall3(&libc_write, uintptr(fd), uintptr(p), uintptr(n))
-	if int32(r) == -1 {
-		println("syscall write failed: ", hex(err))
-		throw("syscall write")
-	}
+	r, _ := syscall3(&libc_write, uintptr(fd), uintptr(p), uintptr(n))
 	return int32(r)
 
 }
 
-// We do authorize error EAGAIN as it can happen inside netpoll
 //go:nosplit
 func read(fd int32, p unsafe.Pointer, n int32) int32 {
-	r, err := syscall3(&libc_read, uintptr(fd), uintptr(p), uintptr(n))
-	if int32(r) == -1 && err != _EAGAIN {
-		println("syscall read failed: ", hex(err))
-		throw("syscall read")
-	}
+	r, _ := syscall3(&libc_read, uintptr(fd), uintptr(p), uintptr(n))
 	return int32(r)
 }
 
 //go:nosplit
 func open(name *byte, mode, perm int32) int32 {
-	r, err := syscall3(&libc_open, uintptr(unsafe.Pointer(name)), uintptr(mode), uintptr(perm))
-	if int32(r) == -1 {
-		println("syscall open failed: ", hex(err))
-		throw("syscall open")
-	}
+	r, _ := syscall3(&libc_open, uintptr(unsafe.Pointer(name)), uintptr(mode), uintptr(perm))
 	return int32(r)
 }
 
 //go:nosplit
 func closefd(fd int32) int32 {
-	r, err := syscall1(&libc_close, uintptr(fd))
-	if int32(r) == -1 {
-		println("syscall close failed: ", hex(err))
-		throw("syscall close")
-	}
+	r, _ := syscall1(&libc_close, uintptr(fd))
 	return int32(r)
 }
 
