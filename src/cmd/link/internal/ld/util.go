@@ -89,3 +89,10 @@ var start = time.Now()
 func elapsed() float64 {
 	return time.Since(start).Seconds()
 }
+
+func max(a int32, b int32) int32 {
+	if a > b {
+		return a
+	}
+	return b
+}

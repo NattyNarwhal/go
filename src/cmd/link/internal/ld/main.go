@@ -221,6 +221,10 @@ func Main(arch *sys.Arch, theArch Arch) {
 	if ctxt.HeadType == objabi.Hwindows {
 		ctxt.dope()
 	}
+	if ctxt.HeadType == objabi.Haix {
+		ctxt.doxcoff()
+	}
+
 	ctxt.addexport()
 	thearch.Gentext(ctxt) // trampolines, call stubs, etc.
 	ctxt.textbuildid()

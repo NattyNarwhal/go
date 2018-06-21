@@ -493,7 +493,7 @@ func archrelocaddr(ctxt *ld.Link, r *sym.Reloc, s *sym.Symbol, val *int64) bool 
 
 	t := ld.Symaddr(r.Sym) + r.Add
 	if t < 0 || t >= 1<<31 {
-		ld.Errorf(s, "relocation for %s is too big (>=2G): %d", s.Name, ld.Symaddr(r.Sym))
+		ld.Errorf(s, "relocation for %s is too big (>=2G): 0x%x", s.Name, ld.Symaddr(r.Sym))
 	}
 	if t&0x8000 != 0 {
 		t += 0x10000
@@ -948,6 +948,13 @@ func asmb(ctxt *ld.Link) {
 	ctxt.Out.SeekSet(int64(ld.Segdwarf.Fileoff))
 	ld.Dwarfblk(ctxt, int64(ld.Segdwarf.Vaddr), int64(ld.Segdwarf.Filelen))
 
+	loadersize := uint64(0)
+	if ctxt.HeadType == objabi.Haix && ctxt.BuildMode == ld.BuildModeExe {
+		loadero := uint64(ld.Rnd(int64(ld.Segdwarf.Fileoff+ld.Segdwarf.Filelen), int64(*ld.FlagRound)))
+		ctxt.Out.SeekSet(int64(loadero))
+		loadersize = ld.Loaderblk(ctxt, loadero)
+	}
+
 	/* output symbol table */
 	ld.Symsize = 0
 
@@ -967,6 +974,16 @@ func asmb(ctxt *ld.Link) {
 
 		case objabi.Hplan9:
 			symo = uint32(ld.Segdata.Fileoff + ld.Segdata.Filelen)
+
+		case objabi.Haix:
+			symo = uint32(ld.Segdwarf.Fileoff + ld.Segdwarf.Filelen)
+
+			// Add loader size if needed
+			if ctxt.BuildMode == ld.BuildModeExe {
+				symo = uint32(ld.Rnd(int64(symo), int64(*ld.FlagRound)))
+				symo += uint32(loadersize)
+			}
+			symo = uint32(ld.Rnd(int64(symo), int64(*ld.FlagRound)))
 		}
 
 		ctxt.Out.SeekSet(int64(symo))
@@ -995,6 +1012,10 @@ func asmb(ctxt *ld.Link) {
 				ctxt.Out.Write(sym.P)
 				ctxt.Out.Flush()
 			}
+
+		case objabi.Haix:
+			ld.Asmaixsym(ctxt)
+			ctxt.Out.Flush()
 		}
 	}
 
@@ -1020,6 +1041,9 @@ func asmb(ctxt *ld.Link) {
 		objabi.Hopenbsd,
 		objabi.Hnacl:
 		ld.Asmbelf(ctxt, int64(symo))
+
+	case objabi.Haix:
+		ld.Asmbxcoff(ctxt)
 	}
 
 	ctxt.Out.Flush()

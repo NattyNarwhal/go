@@ -164,7 +164,7 @@ func relocsym(ctxt *Link, s *sym.Symbol) {
 		// We need to be able to reference dynimport symbols when linking against
 		// shared libraries, and Solaris and Darwin need it always
 		if ctxt.HeadType != objabi.Hsolaris && ctxt.HeadType != objabi.Hdarwin && r.Sym != nil && r.Sym.Type == sym.SDYNIMPORT && !ctxt.DynlinkingGo() && !r.Sym.Attr.SubSymbol() {
-			if !(ctxt.Arch.Family == sys.PPC64 && ctxt.LinkMode == LinkExternal && r.Sym.Name == ".TOC.") {
+			if !(ctxt.Arch.Family == sys.PPC64 && ctxt.LinkMode == LinkExternal && r.Sym.Name == ".TOC.") && !(ctxt.IsAix && r.Sym.Type == sym.SDYNIMPORT && r.Type == objabi.R_ADDRPOWER) {
 				Errorf(s, "unhandled relocation for %s (type %d (%s) rtype %d (%s))", r.Sym.Name, r.Sym.Type, r.Sym.Type, r.Type, sym.RelocName(ctxt.Arch, r.Type))
 			}
 		}
@@ -298,6 +298,17 @@ func relocsym(ctxt *Link, s *sym.Symbol) {
 				}
 
 				break
+			}
+			// On Aix, if a relocated symbol is in .data, its relocation
+			// must be done by the loader, as we don't know its future address
+			// We don't care about the o value as it will be changed anyway
+			// runtime.algarray is different because it will end up in .rodata section
+			if ctxt.IsAix && r.Sym.Sect.Seg == &Segdata && r.Sym.Name != "runtime.algarray" {
+				// It's not possible to make a loader relocation to a dwarf section.
+				// FIXME
+				if s.Sect.Seg != &Segdwarf {
+					xfile.addloaderreloc(ctxt, s, r)
+				}
 			}
 
 			o = Symaddr(r.Sym) + r.Add
@@ -574,6 +585,12 @@ func dynrelocsym(ctxt *Link, s *sym.Symbol) {
 			thearch.Adddynrel(ctxt, s, r)
 			continue
 		}
+
+		if ctxt.IsAix && r.Sym != nil && r.Sym.Type == sym.SDYNIMPORT {
+			xfile.dynSymbols = append(xfile.dynSymbols, s)
+			continue
+		}
+
 		if r.Sym != nil && r.Sym.Type == sym.SDYNIMPORT || r.Type >= 256 {
 			if r.Sym != nil && !r.Sym.Attr.Reachable() {
 				Errorf(s, "dynamic relocation to unreachable symbol %s", r.Sym.Name)
@@ -1293,6 +1310,14 @@ func (ctxt *Link) dodata() {
 		gc.AddSym(s)
 		datsize += s.Size
 	}
+	// On Aix, .toc entries must be the last of .data
+	for _, s := range data[sym.SXCOFFTOC] {
+		s.Sect = sect
+		s.Type = sym.SDATA
+		datsize = aligndatsize(datsize, s)
+		s.Value = int64(uint64(datsize) - sect.Vaddr)
+		datsize += s.Size
+	}
 	checkdatsize(ctxt, datsize, sym.SDATA)
 	sect.Length = uint64(datsize) - sect.Vaddr
 	gc.End(int64(sect.Length))
@@ -1652,6 +1677,10 @@ func (ctxt *Link) dodata() {
 	}
 	for _, sect := range Segdata.Sections {
 		sect.Extnum = int16(n)
+		if ctxt.IsAix && (sect.Name == ".noptrdata" || sect.Name == ".noptrbss") {
+			// On Aix, "noptr" sections are merged with their "ptr" section
+			continue
+		}
 		n++
 	}
 	for _, sect := range Segdwarf.Sections {
