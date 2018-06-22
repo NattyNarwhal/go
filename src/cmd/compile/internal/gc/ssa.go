@@ -88,6 +88,9 @@ func initssaconfig() {
 	ControlWord64trunc = sysfunc("controlWord64trunc")
 	ControlWord32 = sysfunc("controlWord32")
 
+	// PPC64
+	NilDereferencePanic = sysfunc("NilDereferencePanic")
+
 	// Wasm
 	WasmMove = sysfunc("wasmMove")
 	WasmZero = sysfunc("wasmZero")

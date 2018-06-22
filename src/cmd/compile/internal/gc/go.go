@@ -313,6 +313,9 @@ var (
 	ControlWord64trunc,
 	ControlWord32 *obj.LSym
 
+	// PPC64
+	NilDereferencePanic *obj.LSym
+
 	// Wasm
 	WasmMove,
 	WasmZero,

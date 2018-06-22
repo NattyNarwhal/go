@@ -270,3 +270,8 @@ func walltime() (sec int64, nsec int32) {
 	}
 	return ts.tv_sec, int32(ts.tv_nsec)
 }
+
+//go:nosplit
+func NilDereferencePanic() {
+	panic("nil pointer dereference")
+}

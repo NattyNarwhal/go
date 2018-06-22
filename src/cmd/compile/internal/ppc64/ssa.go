@@ -10,6 +10,7 @@ import (
 	"cmd/compile/internal/types"
 	"cmd/internal/obj"
 	"cmd/internal/obj/ppc64"
+	"cmd/internal/objabi"
 	"math"
 	"strings"
 )
@@ -1143,13 +1144,41 @@ func ssaGenValue(s *gc.SSAGenState, v *ssa.Value) {
 		p.To.Sym = v.Aux.(*obj.LSym)
 
 	case ssa.OpPPC64LoweredNilCheck:
-		// Issue a load which will fault if arg is nil.
-		p := s.Prog(ppc64.AMOVBZ)
-		p.From.Type = obj.TYPE_MEM
-		p.From.Reg = v.Args[0].Reg()
-		gc.AddAux(&p.From, v)
-		p.To.Type = obj.TYPE_REG
-		p.To.Reg = ppc64.REGTMP
+		if objabi.GOOS == "aix" {
+			// CMP Rarg0, R0
+			// BNE 2(PC)
+			// BL runtime.errorNilDereference
+			// NOP (so the BNE has somewhere to land)
+
+			// CMP Rarg0, R0
+			p := s.Prog(ppc64.ACMP)
+			p.From.Type = obj.TYPE_REG
+			p.From.Reg = v.Args[0].Reg()
+			p.To.Type = obj.TYPE_REG
+			p.To.Reg = ppc64.REG_R0
+
+			// BNE 2(PC)
+			p2 := s.Prog(ppc64.ABNE)
+			p2.To.Type = obj.TYPE_BRANCH
+
+			// BL runtime.NilDereferencePanic
+			p = s.Prog(ppc64.ABL)
+			p.To.Type = obj.TYPE_BRANCH
+			p.To.Sym = gc.NilDereferencePanic
+
+			// NOP (so the BNE has somewhere to land)
+			nop := s.Prog(obj.ANOP)
+			gc.Patch(p2, nop)
+
+		} else {
+			// Issue a load which will fault if arg is nil.
+			p := s.Prog(ppc64.AMOVBZ)
+			p.From.Type = obj.TYPE_MEM
+			p.From.Reg = v.Args[0].Reg()
+			gc.AddAux(&p.From, v)
+			p.To.Type = obj.TYPE_REG
+			p.To.Reg = ppc64.REGTMP
+		}
 		if gc.Debug_checknil != 0 && v.Pos.Line() > 1 { // v.Pos.Line()==1 in generated wrappers
 			gc.Warnl(v.Pos, "generated nil check")
 		}
