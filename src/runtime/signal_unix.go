@@ -395,6 +395,21 @@ func sigpanic() {
 		}
 		print("unexpected fault address ", hex(g.sigcode1), "\n")
 		throw("fault")
+	case _SIGILL:
+		// This code is a workaround for Aix.
+		// As a nil dereference is possible, a nil object calling a method will
+		// ends up in the first memory page and triggers a SIGILL
+		// Therefore, Aix SIGILL must panic and not throw.
+		// TODO(aix): remove once nil dereference is fixed
+		if g.sigcode0 == 30 && g.sigcode1 < 0x1000 {
+			panicmem()
+		}
+		// Support runtime/debug.SetPanicOnFault.
+		if g.paniconfault {
+			panicmem()
+		}
+		print("unexpected fault address ", hex(g.sigcode1), "\n")
+		throw("fault")
 	case _SIGFPE:
 		switch g.sigcode0 {
 		case _FPE_INTDIV:
