@@ -27,6 +27,7 @@ var (
 //go:cgo_import_dynamic libc_clock_gettime clock_gettime "libc.a/shr_64.o"
 //go:cgo_import_dynamic libc_close close "libc.a/shr_64.o"
 //go:cgo_import_dynamic libc_exit exit "libc.a/shr_64.o"
+//go:cgo_import_dynamic libc_kill kill "libc.a/shr_64.o"
 //go:cgo_import_dynamic libc_madvise madvise "libc.a/shr_64.o"
 //go:cgo_import_dynamic libc_malloc malloc "libc.a/shr_64.o"
 //go:cgo_import_dynamic libc_mmap mmap "libc.a/shr_64.o"
@@ -40,6 +41,7 @@ var (
 //go:cgo_import_dynamic libc_sem_post sem_post "libc.a/shr_64.o"
 //go:cgo_import_dynamic libc_sem_timedwait sem_timedwait "libc.a/shr_64.o"
 //go:cgo_import_dynamic libc_sem_wait sem_wait "libc.a/shr_64.o"
+//go:cgo_import_dynamic libc_setitimer setitimer "libc.a/shr_64.o"
 //go:cgo_import_dynamic libc_sigaction sigaction "libc.a/shr_64.o"
 //go:cgo_import_dynamic libc_sigaltstack sigaltstack "libc.a/shr_64.o"
 //go:cgo_import_dynamic libc_sysconf sysconf "libc.a/shr_64.o"
@@ -60,6 +62,7 @@ var (
 //go:linkname libc_clock_gettime libc_clock_gettime
 //go:linkname libc_close libc_close
 //go:linkname libc_exit libc_exit
+//go:linkname libc_kill libc_kill
 //go:linkname libc_madvise libc_madvise
 //go:linkname libc_malloc libc_malloc
 //go:linkname libc_mmap libc_mmap
@@ -73,6 +76,7 @@ var (
 //go:linkname libc_sem_post libc_sem_post
 //go:linkname libc_sem_timedwait libc_sem_timedwait
 //go:linkname libc_sem_wait libc_sem_wait
+//go:linkname libc_setitimer libc_setitimer
 //go:linkname libc_sigaction libc_sigaction
 //go:linkname libc_sigaltstack libc_sigaltstack
 //go:linkname libc_sysconf libc_sysconf
@@ -95,6 +99,7 @@ var (
 	libc_clock_gettime,
 	libc_close,
 	libc_exit,
+	libc_kill,
 	libc_madvise,
 	libc_malloc,
 	libc_mmap,
@@ -108,6 +113,7 @@ var (
 	libc_sem_post,
 	libc_sem_timedwait,
 	libc_sem_wait,
+	libc_setitimer,
 	libc_sigaction,
 	libc_sigaltstack,
 	libc_sysconf,
@@ -322,6 +328,15 @@ func clock_gettime(clockid int32, tp *timespec) int32 {
 }
 
 //go:nosplit
+func setitimer(mode int32, new, old *itimerval) {
+	r, err := syscall3(&libc_setitimer, uintptr(mode), uintptr(unsafe.Pointer(new)), uintptr(unsafe.Pointer(old)))
+	if int32(r) == -1 {
+		println("syscall setitimer failed: ", hex(err))
+		throw("syscall setitimer")
+	}
+}
+
+//go:nosplit
 func malloc(size uintptr) unsafe.Pointer {
 	r, _ := syscall1(&libc_malloc, size)
 	return unsafe.Pointer(r)
@@ -359,6 +374,19 @@ func raise(sig uint32) {
 		throw("syscall raise")
 	}
 }
+
+//go:nosplit
+func raiseproc(sig uint32) {
+	// libc_getpid declared in syscall_aix.go
+	pid, err := syscall0(&libc_getpid)
+	if int32(pid) == -1 {
+		println("syscall getpid failed: ", hex(err))
+		throw("syscall raiseproc")
+	}
+
+	syscall2(&libc_kill, pid, uintptr(sig))
+}
+
 func osyield1()
 
 //go:nosplit

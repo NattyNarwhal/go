@@ -191,14 +191,6 @@ func goenvs() {
 	goenvs_unix()
 }
 
-func setitimer(mode int32, new, old *itimerval) {
-	throw("Not yet implemented\n")
-}
-
-func raiseproc(sig uint32) {
-	throw("Not yet implemented\n")
-}
-
 /* SIGNAL */
 
 const (
