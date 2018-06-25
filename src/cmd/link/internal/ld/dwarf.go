@@ -1351,8 +1351,16 @@ func writelines(ctxt *Link, lib *sym.Library, textp []*sym.Symbol, ls *sym.Symbo
 	dwarf.Uleb128put(dwarfctxt, ls, 1)
 	ls.AddUint8(dwarf.DW_LNE_end_sequence)
 
-	ls.SetUint32(ctxt.Arch, unitLengthOffset, uint32(ls.Size-unitstart))
-	ls.SetUint32(ctxt.Arch, headerLengthOffset, uint32(headerend-headerstart))
+	if ctxt.HeadType == objabi.Haix {
+		dwsectCUSize[".debug_line."+lib.String()] = uint64(ls.Size - unitLengthOffset)
+	}
+	if dwarfctxt.IsDwarf64() {
+		ls.SetUint(ctxt.Arch, unitLengthOffset+4, uint64(ls.Size-unitstart)) // +4 because of 0xFFFFFFFF
+		ls.SetUint(ctxt.Arch, headerLengthOffset, uint64(headerend-headerstart))
+	} else {
+		ls.SetUint32(ctxt.Arch, unitLengthOffset, uint32(ls.Size-unitstart))
+		ls.SetUint32(ctxt.Arch, headerLengthOffset, uint32(headerend-headerstart))
+	}
 
 	// Apply any R_DWARFFILEREF relocations, since we now know the
 	// line table file indices for this compilation unit. Note that
