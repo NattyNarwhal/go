@@ -1248,7 +1248,7 @@ func mstart() {
 	mstart1()
 
 	// Exit this thread.
-	if GOOS == "windows" || GOOS == "solaris" || GOOS == "plan9" || GOOS == "darwin" || GOOS == "aix " {
+	if GOOS == "windows" || GOOS == "solaris" || GOOS == "plan9" || GOOS == "darwin" || GOOS == "aix" {
 		// Window, Solaris, Darwin, Aix and Plan 9 always system-allocate
 		// the stack, but put it in _g_.stack before mstart,
 		// so the logic above hasn't set osStack yet.
