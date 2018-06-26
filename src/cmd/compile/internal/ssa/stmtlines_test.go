@@ -5,6 +5,7 @@ import (
 	"debug/elf"
 	"debug/macho"
 	"debug/pe"
+	"debug/xcoff"
 	"fmt"
 	"internal/testenv"
 	"io"
@@ -22,6 +23,10 @@ func open(path string) (*dwarf.Data, error) {
 	}
 
 	if fh, err := macho.Open(path); err == nil {
+		return fh.DWARF()
+	}
+
+	if fh, err := xcoff.Open(path); err == nil {
 		return fh.DWARF()
 	}
 
