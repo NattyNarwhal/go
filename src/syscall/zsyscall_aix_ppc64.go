@@ -60,6 +60,7 @@ import "unsafe"
 //go:cgo_import_dynamic libc_Rmdir rmdir "libc.a/shr_64.o"
 //go:cgo_import_dynamic libc_lseek lseek "libc.a/shr_64.o"
 //go:cgo_import_dynamic libc_Truncate truncate "libc.a/shr_64.o"
+//go:cgo_import_dynamic libc_Umask umask "libc.a/shr_64.o"
 //go:cgo_import_dynamic libc_Unlink unlink "libc.a/shr_64.o"
 //go:cgo_import_dynamic libc_Uname uname "libc.a/shr_64.o"
 //go:cgo_import_dynamic libc_write write "libc.a/shr_64.o"
@@ -133,6 +134,7 @@ import "unsafe"
 //go:linkname libc_Rmdir libc_Rmdir
 //go:linkname libc_lseek libc_lseek
 //go:linkname libc_Truncate libc_Truncate
+//go:linkname libc_Umask libc_Umask
 //go:linkname libc_Unlink libc_Unlink
 //go:linkname libc_Uname libc_Uname
 //go:linkname libc_write libc_write
@@ -209,6 +211,7 @@ var (
 	libc_Rmdir,
 	libc_lseek,
 	libc_Truncate,
+	libc_Umask,
 	libc_Unlink,
 	libc_Uname,
 	libc_write,
@@ -768,6 +771,12 @@ func Truncate(path string, length int64) (err error) {
 	if e1 != 0 {
 		err = errnoErr(e1)
 	}
+	return
+}
+
+func Umask(newmask int) (oldmask int) {
+	r0, _, _ := syscall6(uintptr(unsafe.Pointer(&libc_Umask)), 1, uintptr(newmask), 0, 0, 0, 0, 0)
+	oldmask = int(r0)
 	return
 }
 

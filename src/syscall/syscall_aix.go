@@ -486,6 +486,7 @@ func (w WaitStatus) TrapCause() int { return -1 }
 //sys	Rmdir(path string) (err error)
 //sys	Seek(fd int, offset int64, whence int) (newoffset int64, err error) = lseek
 //sys	Truncate(path string, length int64) (err error)
+//sys	Umask(newmask int) (oldmask int)
 //sys	Unlink(path string) (err error)
 //sysnb	Uname(buf *Utsname) (err error)
 //sys	write(fd int, p []byte) (n int, err error)
