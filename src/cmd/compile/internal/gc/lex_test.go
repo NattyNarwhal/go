@@ -7,6 +7,7 @@ package gc
 import (
 	"cmd/compile/internal/syntax"
 	"reflect"
+	"runtime"
 	"testing"
 )
 
@@ -73,7 +74,16 @@ func TestPragcgo(t *testing.T) {
 
 	var p noder
 	var nopos syntax.Pos
-	for _, tt := range tests {
+	for i, tt := range tests {
+		// cgo_import_dynamic with a library is slightly different on Aix
+		// as the library field must follow the pattern [libc.a/object.o]
+		// However, as p.error is a chan, the whole test structure must be
+		// changed in order to handle this error.
+		// Therefore, there are currently disabled for Aix
+		// TODO(aix): adapt this test to pragcgo errors
+		if runtime.GOOS == "aix" && (i == 8 || i == 9) {
+			continue
+		}
 		p.pragcgobuf = nil
 		p.pragcgo(nopos, tt.in)
 
