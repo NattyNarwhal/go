@@ -1677,7 +1677,7 @@ func (ctxt *Link) dodata() {
 	}
 	for _, sect := range Segdata.Sections {
 		sect.Extnum = int16(n)
-		if ctxt.IsAix && (sect.Name == ".noptrdata" || sect.Name == ".noptrbss") {
+		if ctxt.IsAix && (sect.Name == ".noptrdata" || sect.Name == ".bss") {
 			// On Aix, "noptr" sections are merged with their "ptr" section
 			continue
 		}

@@ -100,6 +100,17 @@ func (f *File) Close() error {
 	return err
 }
 
+// Section returns the first section with the given name, or nil if no such
+// section exists.
+func (f *File) Section(name string) *Section {
+	for _, s := range f.Sections {
+		if s.Name == name {
+			return s
+		}
+	}
+	return nil
+}
+
 // SectionByType returns the first section in f with the
 // given type, or nil if there is no such section.
 func (f *File) SectionByType(typ uint32) *Section {
