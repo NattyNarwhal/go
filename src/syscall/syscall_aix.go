@@ -99,16 +99,18 @@ func (sa *SockaddrInet6) sockaddr() (unsafe.Pointer, _Socklen, error) {
 	return unsafe.Pointer(&sa.raw), SizeofSockaddrInet6, nil
 }
 
+func (sa *RawSockaddrUnix) setLen(n int) {
+	sa.Len = uint8(3 + n) // 2 for Family, Len; 1 for NUL.
+}
+
 func (sa *SockaddrUnix) sockaddr() (unsafe.Pointer, _Socklen, error) {
 	name := sa.Name
 	n := len(name)
 	if n > len(sa.raw.Path) {
 		return nil, 0, EINVAL
 	}
-	if n == len(sa.raw.Path) && name[0] != '@' {
-		return nil, 0, EINVAL
-	}
 	sa.raw.Family = AF_UNIX
+	sa.raw.setLen(n)
 	for i := 0; i < n; i++ {
 		sa.raw.Path[i] = uint8(name[i])
 	}
@@ -116,11 +118,6 @@ func (sa *SockaddrUnix) sockaddr() (unsafe.Pointer, _Socklen, error) {
 	sl := _Socklen(2)
 	if n > 0 {
 		sl += _Socklen(n) + 1
-	}
-	if sa.raw.Path[0] == '@' {
-		sa.raw.Path[0] = 0
-		// Don't count trailing NUL for abstract address.
-		sl--
 	}
 
 	return unsafe.Pointer(&sa.raw), sl, nil
@@ -316,19 +313,27 @@ func SendmsgN(fd int, p, oob []byte, to Sockaddr, flags int) (n int, err error) 
 	return n, nil
 }
 
+func (sa *RawSockaddrUnix) getLen() (int, error) {
+	// Some versions of AIX have a bug in getsockname (see IV78655).
+	// We can't rely on sa.Len being set correctly.
+	n := SizeofSockaddrUnix - 3 // substract leading Family, Len, terminating NUL.
+	for i := 0; i < n; i++ {
+		if sa.Path[i] == 0 {
+			n = i
+			break
+		}
+	}
+	return n, nil
+}
+
 func anyToSockaddr(rsa *RawSockaddrAny) (Sockaddr, error) {
 	switch rsa.Addr.Family {
 	case AF_UNIX:
 		pp := (*RawSockaddrUnix)(unsafe.Pointer(rsa))
 		sa := new(SockaddrUnix)
-		// Assume path ends at NUL.
-		// This is not technically the Linux semantics for
-		// abstract Unix domain sockets--they are supposed
-		// to be uninterpreted fixed-size binary blobs--but
-		// everyone uses this convention.
-		n := 0
-		for n < len(pp.Path) && pp.Path[n] != 0 {
-			n++
+		n, err := pp.getLen()
+		if err != nil {
+			return nil, err
 		}
 		bytes := (*[len(pp.Path)]byte)(unsafe.Pointer(&pp.Path[0]))
 		sa.Name = string(bytes[0:n])
