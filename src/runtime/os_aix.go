@@ -163,11 +163,6 @@ func newosproc(mp *m) {
 		}
 		throw("newosproc")
 	}
-	// Sometimes, pthread_attr_destroy fails without reasons
-	// FIXME
-	if pthread_attr_destroy(&attr) != 0 {
-		println("pthread_attr_destroy fails")
-	}
 
 }
 
