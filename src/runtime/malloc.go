@@ -295,7 +295,7 @@ const (
 	//
 	// On other platforms, the user address space is contiguous
 	// and starts at 0, so no offset is necessary.
-	arenaBaseOffset uintptr = sys.GoarchAmd64 * (1 << 47) + sys.GoosAix * (0xa0 << 52)
+	arenaBaseOffset uintptr = sys.GoarchAmd64*(1<<47) + sys.GoosAix*(0xa0<<52)
 
 	// Max number of threads to run garbage collection.
 	// 2, 3, and 4 are all plausible maximums depending
@@ -308,7 +308,7 @@ const (
 	// since we assume that the first page is never mapped.
 	//
 	// This should agree with minZeroPage in the compiler.
-	minLegalPointer uintptr = 4096
+	minLegalPointer uintptr = 4096 * (1 - sys.GoosAix)
 )
 
 // physPageSize is the size in bytes of the OS's physical pages.

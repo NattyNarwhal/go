@@ -5,6 +5,7 @@
 package ssa
 
 import (
+	"cmd/internal/objabi"
 	"cmd/internal/src"
 )
 
@@ -180,7 +181,14 @@ func nilcheckelim(f *Func) {
 // All platforms are guaranteed to fault if we load/store to anything smaller than this address.
 //
 // This should agree with minLegalPointer in the runtime.
-const minZeroPage = 4096
+var minZeroPage int64
+
+func init() {
+	minZeroPage = 4096
+	if objabi.GOOS == "aix" {
+		minZeroPage = 0
+	}
+}
 
 // nilcheckelim2 eliminates unnecessary nil checks.
 // Runs after lowering and scheduling.
