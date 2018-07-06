@@ -1296,11 +1296,7 @@ func (ctxt *Link) dodata() {
 	/* data */
 	sect = addsection(ctxt.Arch, &Segdata, ".data", 06)
 	sect.Align = dataMaxAlign[sym.SDATA]
-	if ctxt.HeadType != objabi.Haix {
-		// On Aix, pointer-free sections are merged in their pointer sections
-		// Therefore, it must not have any align between them
-		datsize = Rnd(datsize, int64(sect.Align))
-	}
+	datsize = Rnd(datsize, int64(sect.Align))
 	sect.Vaddr = uint64(datsize)
 	ctxt.Syms.Lookup("runtime.data", 0).Sect = sect
 	ctxt.Syms.Lookup("runtime.edata", 0).Sect = sect
@@ -1329,10 +1325,7 @@ func (ctxt *Link) dodata() {
 	/* bss */
 	sect = addsection(ctxt.Arch, &Segdata, ".bss", 06)
 	sect.Align = dataMaxAlign[sym.SBSS]
-	if ctxt.HeadType != objabi.Haix {
-		// On Aix, .data and .bss must not have an alignment space between them
-		datsize = Rnd(datsize, int64(sect.Align))
-	}
+	datsize = Rnd(datsize, int64(sect.Align))
 	sect.Vaddr = uint64(datsize)
 	ctxt.Syms.Lookup("runtime.bss", 0).Sect = sect
 	ctxt.Syms.Lookup("runtime.ebss", 0).Sect = sect
@@ -1352,11 +1345,7 @@ func (ctxt *Link) dodata() {
 	/* pointer-free bss */
 	sect = addsection(ctxt.Arch, &Segdata, ".noptrbss", 06)
 	sect.Align = dataMaxAlign[sym.SNOPTRBSS]
-	if ctxt.HeadType != objabi.Haix {
-		// On Aix, pointer-free sections are merged in their pointer sections
-		// Therefore, it must not have any align between them
-		datsize = Rnd(datsize, int64(sect.Align))
-	}
+	datsize = Rnd(datsize, int64(sect.Align))
 	sect.Vaddr = uint64(datsize)
 	ctxt.Syms.Lookup("runtime.noptrbss", 0).Sect = sect
 	ctxt.Syms.Lookup("runtime.enoptrbss", 0).Sect = sect

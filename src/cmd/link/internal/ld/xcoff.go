@@ -1157,8 +1157,9 @@ func Asmbxcoff(ctxt *Link) {
 	}
 
 	// Merge .noptrdata inside .data
-	sdata.Length += snoptrdata.Length
 	sdata.Vaddr = snoptrdata.Vaddr
+	// Fix data length to remove gap between .data and .bss
+	sdata.Length = sbss.Vaddr - sdata.Vaddr
 	s := xfile.addSection(sdata)
 	s.Sflags = STYP_DATA
 	xfile.xahdr.Odatastart = s.Spaddr
