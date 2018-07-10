@@ -92,12 +92,22 @@ func netpollinited() bool {
 	return atomic.Load(&netpollInited) != 0
 }
 
-//go:linkname poll_runtime_pollServerDescriptor internal/poll.runtime_pollServerDescriptor
+//go:linkname poll_runtime_isPollServerDescriptor internal/poll.runtime_isPollServerDescriptor
 
-// poll_runtime_pollServerDescriptor returns the descriptor being used,
-// or ^uintptr(0) if the system does not use a poll descriptor.
-func poll_runtime_pollServerDescriptor() uintptr {
-	return netpolldescriptor()
+// poll_runtime_isPollServerDescriptor return true if fd is the
+// descriptor being used.
+// This is useful because some OS (like aix) can have more than one fd
+// inside netpoll implementation
+func poll_runtime_isPollServerDescriptor(fd uintptr) bool {
+	fds := netpolldescriptor()
+	if GOOS != "aix" {
+		return fd == fds
+	} else {
+		// Aix have a pipe on its netpoll implementation
+		// Therefore, two fd are used.
+		// There are returned by netpolldescriptor using a mask
+		return fd == fds&0xFFFF || fd == (fds>>16)&0xFFFF
+	}
 }
 
 //go:linkname poll_runtime_pollOpen internal/poll.runtime_pollOpen

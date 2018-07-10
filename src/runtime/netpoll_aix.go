@@ -116,7 +116,8 @@ func netpollinit() {
 
 func netpolldescriptor() uintptr {
 	// ps is not a real file descriptor.
-	return ^uintptr(0)
+	return uintptr(rdwake<<16 | wrwake)
+
 }
 
 func netpollopen(fd uintptr, pd *pollDesc) int32 {
@@ -124,7 +125,9 @@ func netpollopen(fd uintptr, pd *pollDesc) int32 {
 	// so wakeup pollset_poll first.
 	atomic.Store(&needsUpdate, 1)
 	b := [1]byte{0}
-	write(uintptr(wrwake), unsafe.Pointer(&b[0]), 1)
+	if write(uintptr(wrwake), unsafe.Pointer(&b[0]), 1) != 1 {
+		panic("netpollopen write failed ")
+	}
 
 	var pctl poll_ctl
 	pctl.cmd = _PS_ADD
@@ -146,7 +149,9 @@ func netpollclose(fd uintptr) int32 {
 	// so wakeup pollset_poll first.
 	atomic.Store(&needsUpdate, 1)
 	b := [1]byte{0}
-	write(uintptr(wrwake), unsafe.Pointer(&b[0]), 1)
+	if write(uintptr(wrwake), unsafe.Pointer(&b[0]), 1) != 1 {
+		panic("netpollclose write fail")
+	}
 
 	var pctl poll_ctl
 	pctl.cmd = _PS_DELETE

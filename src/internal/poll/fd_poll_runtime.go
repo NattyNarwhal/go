@@ -17,7 +17,6 @@ import (
 func runtimeNano() int64
 
 func runtime_pollServerInit()
-func runtime_pollServerDescriptor() uintptr
 func runtime_pollOpen(fd uintptr) (uintptr, int)
 func runtime_pollClose(ctx uintptr)
 func runtime_pollWait(ctx uintptr, mode int) int
@@ -25,6 +24,7 @@ func runtime_pollWaitCanceled(ctx uintptr, mode int) int
 func runtime_pollReset(ctx uintptr, mode int) int
 func runtime_pollSetDeadline(ctx uintptr, d int64, mode int)
 func runtime_pollUnblock(ctx uintptr)
+func runtime_isPollServerDescriptor(fd uintptr) bool
 
 type pollDesc struct {
 	runtimeCtx uintptr
@@ -155,8 +155,9 @@ func setDeadlineImpl(fd *FD, t time.Time, mode int) error {
 	return nil
 }
 
-// PollDescriptor returns the descriptor being used by the poller,
-// or ^uintptr(0) if there isn't one. This is only used for testing.
-func PollDescriptor() uintptr {
-	return runtime_pollServerDescriptor()
+// IsPollDescriptor return true if fd is the descriptor being used by the poller
+// This is useful because some OS (like aix) can have more than one fd
+// inside netpoll implementation. This is only used for testing
+func IsPollDescriptor(fd uintptr) bool {
+	return runtime_isPollServerDescriptor(fd)
 }
