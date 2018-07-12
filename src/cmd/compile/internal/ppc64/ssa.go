@@ -1147,7 +1147,7 @@ func ssaGenValue(s *gc.SSAGenState, v *ssa.Value) {
 		if objabi.GOOS == "aix" {
 			// CMP Rarg0, R0
 			// BNE 2(PC)
-			// BL runtime.errorNilDereference
+			// STW R0, 0(R0)
 			// NOP (so the BNE has somewhere to land)
 
 			// CMP Rarg0, R0
@@ -1161,10 +1161,13 @@ func ssaGenValue(s *gc.SSAGenState, v *ssa.Value) {
 			p2 := s.Prog(ppc64.ABNE)
 			p2.To.Type = obj.TYPE_BRANCH
 
-			// BL runtime.NilDereferencePanic
-			p = s.Prog(ppc64.ABL)
-			p.To.Type = obj.TYPE_BRANCH
-			p.To.Sym = gc.NilDereferencePanic
+			// STW R0, 0(R0)
+			// Write at 0 is forbidden and will trigger a SIGSEGV
+			p = s.Prog(ppc64.AMOVW)
+			p.From.Type = obj.TYPE_REG
+			p.From.Reg = ppc64.REG_R0
+			p.To.Type = obj.TYPE_MEM
+			p.To.Reg = ppc64.REG_R0
 
 			// NOP (so the BNE has somewhere to land)
 			nop := s.Prog(obj.ANOP)
