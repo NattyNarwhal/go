@@ -104,7 +104,9 @@ func (f *File) Close() error {
 // section exists.
 func (f *File) Section(name string) *Section {
 	for _, s := range f.Sections {
-		if s.Name == name {
+		// Xcoff have section name limited to 8 bytes
+		// Some sections like .gosymtab can be trunked
+		if s.Name == name || (len(name) > 8 && s.Name == name[:8]) {
 			return s
 		}
 	}
@@ -430,7 +432,7 @@ func (f *File) DWARF() (*dwarf.Data, error) {
 	// There are many other DWARF sections, but these
 	// are the ones the debug/dwarf package uses.
 	// Don't bother loading others.
-	var subtypes = [...]uint32{SSUBTYP_DWABREV, SSUBTYP_DWINFO, SSUBTYP_DWLINE, SSUBTYP_DWARNGE, SSUBTYP_DWSTR}
+	var subtypes = [...]uint32{SSUBTYP_DWABREV, SSUBTYP_DWINFO, SSUBTYP_DWLINE, SSUBTYP_DWRNGES, SSUBTYP_DWSTR}
 	var dat [len(subtypes)][]byte
 	for i, subtype := range subtypes {
 		s := f.SectionByType(STYP_DWARF | subtype)
