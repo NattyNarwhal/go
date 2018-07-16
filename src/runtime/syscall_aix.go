@@ -146,7 +146,7 @@ func syscall_exit(code uintptr) {
 //go:linkname syscall_fcntl1 syscall.fcntl1
 //go:nosplit
 func syscall_fcntl1(fd, cmd, arg uintptr) (val, err uintptr) {
-	val, err = syscall2(&libc_fcntl, fd, arg)
+	val, err = syscall3(&libc_fcntl, fd, cmd, arg)
 	return
 
 }
