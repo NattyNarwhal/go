@@ -500,6 +500,13 @@ TEXT runtime·jmpdefer(SB), NOSPLIT|NOFRAME, $0-16
 	MOVD	fv+0(FP), R11
 	MOVD	argp+8(FP), R1
 	SUB	$FIXED_FRAME, R1
+#ifdef GOOS_aix
+	// Aix won't trigger a SIGSEGV if R11 = nil
+	// So it manually triggers it
+	CMP	R0, R11
+	BNE	2(PC)
+	MOVD	R0, 0(R0)
+#endif
 	MOVD	0(R11), R12
 	MOVD	R12, CTR
 	BR	(CTR)
