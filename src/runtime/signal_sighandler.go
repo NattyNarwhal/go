@@ -47,16 +47,6 @@ func sighandler(sig uint32, info *siginfo, ctxt unsafe.Pointer, gp *g) {
 	if sig < uint32(len(sigtable)) {
 		flags = sigtable[sig].flags
 	}
-	if GOOS == "aix" && sig == _SIGILL {
-		// On Aix, nil dereference is possible.
-		// But trying to call method of a nil object will ends up
-		// triggering a SIGILL.
-		// Therefore, _SigThrow is replaced by _SigPanic is this case
-		// TODO(aix): remove once nil dereference is fixed
-		if c.sigpc() < 0x1000 {
-			flags = (flags &^ _SigThrow) | _SigPanic
-		}
-	}
 	if flags&_SigPanic != 0 && gp.throwsplit {
 		// We can't safely sigpanic because it may grow the
 		// stack. Abort in the signal handler instead.
