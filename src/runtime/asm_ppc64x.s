@@ -407,6 +407,13 @@ TEXT NAME(SB), WRAPPER, $MAXSIZE-24;		\
 	BR	-4(PC);				\
 	/* call function */			\
 	MOVD	f+8(FP), R11;			\
+#ifdef GOOS_aix \
+	/* Aix won't trigger a SIGSEGV if R11 = nil */		\
+	/* So it manually triggers it */		\
+	CMP	R0, R11			\
+	BNE	2(PC)				\
+	MOVD	R0, 0(R0)		\
+#endif		\
 	MOVD	(R11), R12;			\
 	MOVD	R12, CTR;			\
 	PCDATA  $PCDATA_StackMapIndex, $0;	\
