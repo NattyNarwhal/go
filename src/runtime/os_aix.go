@@ -200,6 +200,7 @@ var sigtramp funcDescriptor
 func setsig(i uint32, fn uintptr) {
 	var sa sigactiont
 	sa.sa_flags = _SA_SIGINFO | _SA_ONSTACK | _SA_RESTART
+	sa.sa_mask = sigset_all
 	if fn == funcPC(sighandler) {
 		fn = uintptr(unsafe.Pointer(&sigtramp))
 	}
@@ -237,11 +238,6 @@ func sigaddset(mask *sigset, i int) {
 
 func sigdelset(mask *sigset, i int) {
 	(*mask)[(i-1)/64] &^= 1 << ((uint32(i) - 1) & 63)
-}
-
-func sigfillset(mask *uint64) {
-	throw("Not yet implemented\n")
-	//*mask = ^uint64(0)
 }
 
 const (
