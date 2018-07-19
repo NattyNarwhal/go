@@ -45,12 +45,51 @@ TEXT runtime·sigfwd(SB),NOSPLIT,$0-32
 // function descriptor for the real sigtramp
 DATA	runtime·sigtramp+0(SB)/8, $runtime·_sigtramp(SB)
 DATA	runtime·sigtramp+8(SB)/8, $TOC(SB)
-GLOBL	runtime·sigtramp(SB), NOPTR, $16
+DATA	runtime·sigtramp+16(SB)/8, $0
+GLOBL	runtime·sigtramp(SB), NOPTR, $24
 
-TEXT runtime·_sigtramp(SB),NOSPLIT,$64
+// This funcion must not have any frame as we want to control how
+// every registers are used
+TEXT runtime·_sigtramp(SB),NOSPLIT|NOFRAME,$0
+	MOVD	LR, R0
+	MOVD	R0, 16(R1)
 	// initialize essential registers (just in case)
 	BL	runtime·reginit(SB)
+
+	// Note that we are executing on altsigstack here, so we have
+	// more stack available than NOSPLIT would have us believe.
+	// To defeat the linker, we make our own stack frame with
+	// more space:
+	SUB	   $128+FIXED_FRAME, R1
+
+	// Save registers
+	MOVD	R31, 56(R1)
+	MOVD	g, 64(R1)
+	MOVD	R29, 72(R1)
+
+
 	BL	runtime·load_g(SB)
+
+	// Save m->libcall. We need to do this because we
+	// might get interrupted by a signal in runtime·asmcgocall.
+
+	// save m->libcall 
+	MOVD	g_m(g), R6
+	MOVD	(m_libcall+libcall_fn)(R6), R7
+	MOVD	R7, 80(R1)
+	MOVD	(m_libcall+libcall_args)(R6), R7
+	MOVD	R7, 88(R1)
+	MOVD	(m_libcall+libcall_n)(R6), R7
+	MOVD	R7, 96(R1)
+	MOVD	(m_libcall+libcall_r1)(R6), R7
+	MOVD	R7, 104(R1)
+	MOVD	(m_libcall+libcall_r2)(R6), R7
+	MOVD	R7, 112(R1)
+
+	// save errno, it might be EINTR; stuff we do here might reset it.
+	MOVD	(m_mOS+mOS_perrno)(R6), R8
+	MOVD	0(R8), R8
+	MOVD	R8, 120(R1)
 
 	MOVW	R3, FIXED_FRAME+0(R1)
 	MOVD	R4, FIXED_FRAME+8(R1)
@@ -58,12 +97,41 @@ TEXT runtime·_sigtramp(SB),NOSPLIT,$64
 	MOVD	$runtime·sigtrampgo(SB), R12
 	MOVD	R12, CTR
 	BL	(CTR)
-	RET
+
+	MOVD	g_m(g), R6
+	// restore libcall
+	MOVD	80(R1), R7
+	MOVD	R7, (m_libcall+libcall_fn)(R6)
+	MOVD	88(R1), R7
+	MOVD	R7, (m_libcall+libcall_args)(R6)
+	MOVD	96(R1), R7
+	MOVD	R7, (m_libcall+libcall_n)(R6)
+	MOVD	104(R1), R7
+	MOVD	R7, (m_libcall+libcall_r1)(R6)
+	MOVD	112(R1), R7
+	MOVD	R7, (m_libcall+libcall_r2)(R6)
+
+	// restore errno
+	MOVD	(m_mOS+mOS_perrno)(R6), R7
+	MOVD	120(R1), R8
+	MOVD	R8, 0(R7)
+
+	// restore registers
+	MOVD	56(R1),R31
+	MOVD	64(R1),g
+	MOVD	72(R1),R29
+
+	// Don't use RET because we need to restore R31 !
+	ADD $128+FIXED_FRAME, R1
+	MOVD	16(R1), R0
+	MOVD	R0, LR
+	BR (LR)
 
 // function descriptor for the real tstart
 DATA	runtime·tstart+0(SB)/8, $runtime·_tstart(SB)
 DATA	runtime·tstart+8(SB)/8, $TOC(SB)
-GLOBL	runtime·tstart(SB), NOPTR, $16
+DATA	runtime·tstart+16(SB)/8, $0
+GLOBL	runtime·tstart(SB), NOPTR, $24
 
 TEXT runtime·_tstart(SB),NOSPLIT,$0
 	XOR	 R0, R0 // reset R0
