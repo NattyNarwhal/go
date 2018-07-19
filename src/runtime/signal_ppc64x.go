@@ -60,6 +60,8 @@ func (c *sigctxt) sigpc() uintptr { return uintptr(c.pc()) }
 func (c *sigctxt) sigsp() uintptr { return uintptr(c.sp()) }
 func (c *sigctxt) siglr() uintptr { return uintptr(c.link()) }
 
+func (c *sigctxt) sigtoc() uint64 { return c.r2() }
+
 // preparePanic sets up the stack to look like a call to sigpanic.
 func (c *sigctxt) preparePanic(sig uint32, gp *g) {
 	// We arrange link, and pc to pretend the panicking

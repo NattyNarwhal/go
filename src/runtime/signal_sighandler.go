@@ -57,6 +57,14 @@ func sighandler(sig uint32, info *siginfo, ctxt unsafe.Pointer, gp *g) {
 		// causes a memory fault. Don't turn that into a panic.
 		flags = _SigThrow
 	}
+	if GOOS == "aix" && flags&_SigPanic != 0 && c.sigtoc() < 0x10000000 {
+		// Panic won't work if TOC isn't valid
+		// We could have restored it but it's better to throw with the corrupted TOC
+		// than to panic with a TOC which is different than the one that might
+		// have caused the signal.
+		// TODO(aix): remove once os/signal tests are OK ?
+		flags = (flags &^ _SigPanic) | _SigThrow
+	}
 	if c.sigcode() != _SI_USER && flags&_SigPanic != 0 {
 		// The signal is going to cause a panic.
 		// Arrange the stack so that it looks like the point
