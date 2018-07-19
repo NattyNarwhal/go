@@ -559,38 +559,39 @@ TEXT ·asmcgocall(SB),NOSPLIT,$0-20
 g0:
 	// Save room for two of our pointers, plus 32 bytes of callee
 	// save area that lives on the caller stack.
-	// On Aix, 128 bytes must be reserved because it's the size need by C functions
 #ifdef GOOS_aix
-	SUB	$128, R1
-#else
+	// Create a fake LR to improve backtrace
+	MOVD	$runtime·asmcgocall(SB), R6
+	MOVD	R6, 16(R1)
+#endif
 	SUB	$48, R1
 	RLDCR	$0, R1, $~15, R1	// 16-byte alignment for gcc ABI
-#endif
 	MOVD	R5, 40(R1)	// save old g on stack
 	MOVD	(g_stack+stack_hi)(R5), R5
 	SUB	R7, R5
 	MOVD	R5, 32(R1)	// save depth in old g stack (can't just save SP, as stack might be copied during a callback)
+#ifdef GOOS_aix
+	MOVD	R7, 0(R1)	// Save frame pointer to allow manual backtrace with gdb
+#else
 	MOVD	R0, 0(R1)	// clear back chain pointer (TODO can we give it real back trace information?)
+#endif
 	// This is a "global call", so put the global entry point in r12
 	MOVD	R3, R12
 	MOVD	R12, CTR
 	MOVD	R4, R3		// arg in r3
 	BL	(CTR)
 
-	// C code can clobber R0, so set it back to 0.  F27-F31 are
+	// C code can clobber R0, so set it back to 0.	F27-F31 are
 	// callee save, so we don't need to recover those.
 	XOR	R0, R0
 	// Restore g, stack pointer, toc pointer.
 	// R3 is errno, so don't touch it
-#ifdef GOOS_aix
-	MOVD	24(R1), R2
-#endif
 	MOVD	40(R1), g
-	MOVD    (g_stack+stack_hi)(g), R5
-	MOVD    32(R1), R6
-	SUB     R6, R5
+	MOVD	(g_stack+stack_hi)(g), R5
+	MOVD	32(R1), R6
+	SUB		R6, R5
 #ifndef GOOS_aix
-	MOVD    24(R5), R2
+	MOVD	24(R5), R2
 #endif
 	BL	runtime·save_g(SB)
 	MOVD	(g_stack+stack_hi)(g), R5
@@ -598,22 +599,6 @@ g0:
 	SUB	R6, R5
 	MOVD	R5, R1
 
-	// On aix, return values are put into mp.libcall.r1 and mp.libcall.r2
-#ifdef GOOS_aix
-	MOVD	args+8(FP), R5
-	MOVD	R3, (libcall_r1)(R5)
-	MOVD	$-1, R6
-	CMP	R6, R3
-	BNE	skiperrno
-	MOVD	g_m(g), R4
-	MOVD	(m_mOS + mOS_perrno)(R4), R9
-	MOVW	0(R9), R9
-	MOVD	R9, (libcall_err)(R5)
-	RET
-skiperrno:
-	MOVD	R0, (libcall_err)(R5)
-
-#endif
 	MOVW	R3, ret+16(FP)
 	RET
 

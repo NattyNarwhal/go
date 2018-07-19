@@ -14,7 +14,23 @@
 #include "textflag.h"
 #include "asm_ppc64x.h"
 
-TEXT runtime·asmsyscall6(SB),NOSPLIT|NOFRAME,$0
+// This function calls a C function with the function descriptor in R12
+TEXT runtime·callCfunction(SB),	NOSPLIT|NOFRAME,$0
+	MOVD	0(R12), R12
+	MOVD	R2, 24(R1)
+	MOVD	0(R12), R0
+	MOVD	8(R12), R2
+	MOVD	R0, CTR
+	BR	(CTR)
+
+
+// Call a library function with a function descriptor stored
+// in libcall_fn and store the results in libcall struture
+// Up to 6 arguments can be passed to this C function
+// Called by runtime.asmcgocall
+// NOT USING GO CALLING CONVENTION
+TEXT runtime·asmsyscall6(SB),NOSPLIT,$160
+	MOVD	R3, 32(R1) // Save libcall for later
 	MOVD	libcall_fn(R3), R12
 	MOVD	libcall_args(R3), R9
 	MOVD	0(R9), R3
@@ -23,13 +39,30 @@ TEXT runtime·asmsyscall6(SB),NOSPLIT|NOFRAME,$0
 	MOVD	24(R9), R6
 	MOVD	32(R9), R7
 	MOVD	40(R9), R8
+	BL	runtime·callCfunction(SB)
 
-	MOVD	0(R12), R12
-	MOVD	R2, 24(R1)
-	MOVD	0(R12), R0
-	MOVD	8(R12), R2
-	MOVD	R0, CTR
-	BR	(CTR)
+	// Restore R0 and TOC 
+	XOR	R0, R0
+	MOVD	24(R1), R2
+
+	// Store result in libcall
+	MOVD	32(R1), R5
+	MOVD	R3, (libcall_r1)(R5)
+	MOVD	$-1, R6
+	CMP	R6, R3
+	BNE	skiperrno
+
+    // Save errno in libcall
+	BL	runtime·load_g(SB)
+	MOVD	g_m(g), R4
+	MOVD	(m_mOS + mOS_perrno)(R4), R9
+	MOVW	0(R9), R9
+	MOVD	R9, (libcall_err)(R5)
+	RET
+skiperrno:
+	// Reset errno if no error has been returned
+	MOVD	R0, (libcall_err)(R5)
+	RET
 
 
 TEXT runtime·sigfwd(SB),NOSPLIT,$0-32
@@ -66,7 +99,6 @@ TEXT runtime·_sigtramp(SB),NOSPLIT|NOFRAME,$0
 	MOVD	R31, 56(R1)
 	MOVD	g, 64(R1)
 	MOVD	R29, 72(R1)
-
 
 	BL	runtime·load_g(SB)
 
@@ -138,6 +170,8 @@ TEXT runtime·_tstart(SB),NOSPLIT,$0
 
 	// set g
 	MOVD	m_g0(R3), g
+	BL	runtime·save_g(SB)
+    MOVD    R3, g_m(g)
 
 	// Layout new m scheduler stack on os stack.
 	MOVD	R1, R3
@@ -147,8 +181,6 @@ TEXT runtime·_tstart(SB),NOSPLIT,$0
 	ADD	$const__StackGuard, R3
 	MOVD	R3, g_stackguard0(g)
 	MOVD	R3, g_stackguard1(g)
-
-	BL	runtime·save_g(SB)
 
 	BL	runtime·mstart(SB)
 
