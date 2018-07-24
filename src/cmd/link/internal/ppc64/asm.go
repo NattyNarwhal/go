@@ -757,6 +757,11 @@ func archreloc(ctxt *ld.Link, r *sym.Reloc, s *sym.Symbol, val *int64) bool {
 		// Runtime Handling" of "Power Architecture 64-Bit ELF V2 ABI
 		// Specification".
 		v := r.Sym.Value - 0x7000
+		if ctxt.IsAix {
+			// On Aix, the thread pointer points 0x7800 bytes after
+			// the TLS.
+			v -= 0x800
+		}
 		if int64(int16(v)) != v {
 			ld.Errorf(s, "TLS offset out of range %d", v)
 		}
