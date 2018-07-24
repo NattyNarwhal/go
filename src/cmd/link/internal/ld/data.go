@@ -307,7 +307,7 @@ func relocsym(ctxt *Link, s *sym.Symbol) {
 				// It's not possible to make a loader relocation to a dwarf section.
 				// FIXME
 				if s.Sect.Seg != &Segdwarf {
-					xfile.addloaderreloc(ctxt, s, r)
+					Xcoffaddloaderreloc(ctxt, s, r)
 				}
 			}
 

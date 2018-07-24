@@ -6,6 +6,7 @@ package ld
 
 import (
 	"bytes"
+	"cmd/internal/objabi"
 	"cmd/link/internal/sym"
 	"encoding/binary"
 	"strings"
@@ -339,10 +340,14 @@ type XcoffLdImportFile64 struct {
 
 type XcoffLdRel64 struct {
 	Lvaddr  uint64 // Address Field
-	Lrtype  uint16 // Relocation Type
+	Lrtype  uint16 // Relocation Size and Type
 	Lrsecnm int16  // Section Number being relocated
-	Lsymndx uint32 // Loader-Section symbol table index
+	Lsymndx int32  // Loader-Section symbol table index
 }
+
+const (
+	XCOFF_R_POS = 0x00 // A(sym) Positive Relocation
+)
 
 type XcoffLdStr64 struct {
 	size uint16
@@ -787,7 +792,8 @@ func Asmaixsym(ctxt *Link) {
 
 // Add a new imported symbol and a new library if needed
 // Currently, dynamic symbols are considered a .data symbol which will receive
-// their value by the loader
+// their value by the loader. Their relocation is created during the creation
+// of the .loader section, because it needs its symbol index.
 // However, their is no writing protection on those symbols and
 // it might need to be added
 // TODO(aix): Improves dynamic symbols generation
@@ -814,15 +820,21 @@ func (f *xcoffFile) adddynimpsym(ctxt *Link, s *sym.Symbol) {
 }
 
 // Add a relocation to .loader relocation section
-func (f *xcoffFile) addloaderreloc(ctxt *Link, s *sym.Symbol, r *sym.Reloc) {
-	// Currently only TOC is relocated this way
+func Xcoffaddloaderreloc(ctxt *Link, s *sym.Symbol, r *sym.Reloc) {
 	ldr := &XcoffLdRel64{
 		Lvaddr:  uint64(s.Value + int64(r.Off)),
-		Lrtype:  0x3F00,
 		Lrsecnm: s.Sect.Extnum,
-		Lsymndx: 1,
 	}
-	f.loaderReloc = append(f.loaderReloc, ldr)
+	switch r.Type {
+	case objabi.R_ADDR:
+		// Relocation of a .data symbol
+		ldr.Lrtype = 0x3F<<8 + XCOFF_R_POS
+		ldr.Lsymndx = 1 // .data
+	default:
+		Errorf(s, "unexpected .loader relocation to symbol: %s (type: %s)", r.Sym.Name, r.Type.String())
+	}
+
+	xfile.loaderReloc = append(xfile.loaderReloc, ldr)
 
 }
 
@@ -914,7 +926,7 @@ func (f *xcoffFile) writeLdrScn(ctxt *Link, globalOff uint64) {
 			Lvaddr:  uint64(s.Value),
 			Lrtype:  0x3F00,
 			Lrsecnm: s.Sect.Extnum,
-			Lsymndx: uint32(nbldsym),
+			Lsymndx: int32(nbldsym),
 		}
 		dynimpreloc = append(dynimpreloc, ldr)
 		nbldsym++
