@@ -206,7 +206,7 @@ const (
 	// we further limit it to 31 bits.
 	//
 	// WebAssembly currently has a limit of 4GB linear memory.
-	heapAddrBits = (_64bit*(1-sys.GoarchWasm))*48 + (1-_64bit+sys.GoarchWasm)*(32-(sys.GoarchMips+sys.GoarchMipsle))
+	heapAddrBits = 36*sys.GoosAix + (_64bit*(1-(sys.GoarchWasm+sys.GoosAix)))*48 + (1-_64bit+sys.GoarchWasm)*(32-(sys.GoarchMips+sys.GoarchMipsle))
 
 	// maxAlloc is the maximum size of an allocation. On 64-bit,
 	// it's theoretically possible to allocate 1<<heapAddrBits bytes. On
@@ -295,7 +295,8 @@ const (
 	//
 	// On other platforms, the user address space is contiguous
 	// and starts at 0, so no offset is necessary.
-	arenaBaseOffset uintptr = sys.GoarchAmd64*(1<<47) + sys.GoosAix*(0xa0<<52)
+	arenaBaseOffset uintptr = sys.GoarchAmd64 * (1 << 47)
+        arenaBaseOffset2 uintptr = sys.GoosAix * (0x07 << 56)
 
 	// Max number of threads to run garbage collection.
 	// 2, 3, and 4 are all plausible maximums depending
@@ -435,7 +436,8 @@ func mallocinit() {
 					// to avoid collisions with others mmaps done by non-go programs.
 					continue
 				}
-				p = uintptr(i)<<40 | uintptrMask&(0xa0<<52)
+				// p = uintptr(i)<<40 | uintptrMask&(0xa0<<52)
+				p = uintptr(i)<<28 | uintptrMask&(0x07<<56)
 			case raceenabled:
 				// The TSAN runtime requires the heap
 				// to be in the range [0x00c000000000,
@@ -449,6 +451,7 @@ func mallocinit() {
 			}
 			hint := (*arenaHint)(mheap_.arenaHintAlloc.alloc())
 			hint.addr = p
+// 			hint.down = false
 			hint.next, mheap_.arenaHints = mheap_.arenaHints, hint
 		}
 	} else {

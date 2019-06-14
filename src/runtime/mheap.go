@@ -427,13 +427,24 @@ func (sc spanClass) noscan() bool {
 //
 //go:nosplit
 func arenaIndex(p uintptr) arenaIdx {
-	return arenaIdx((p - arenaBaseOffset) / heapArenaBytes)
+//         r := (p + arenaBaseOffset - arenaBaseOffset2)
+// 	s := arenaIdx(r / heapArenaBytes)
+//         
+//         print("arenaIndex ", hex(p), " -> ", hex(r), " -> ", hex(s), "\n")
+//         return s
+// 	return arenaIdx((p + arenaBaseOffset) / heapArenaBytes)
+	return arenaIdx((p + arenaBaseOffset - arenaBaseOffset2) / heapArenaBytes)
 }
 
 // arenaBase returns the low address of the region covered by heap
 // arena i.
 func arenaBase(i arenaIdx) uintptr {
-	return uintptr(i)*heapArenaBytes + arenaBaseOffset
+// 	s := uintptr(i)*heapArenaBytes - arenaBaseOffset + arenaBaseOffset2
+// 	
+//         print("arenaBase ", hex(uintptr(i)), " -> ", hex(s), "\n")
+// 	return s
+// 	return uintptr(i)*heapArenaBytes - arenaBaseOffset
+	return uintptr(i)*heapArenaBytes - arenaBaseOffset + arenaBaseOffset2
 }
 
 type arenaIdx uint
