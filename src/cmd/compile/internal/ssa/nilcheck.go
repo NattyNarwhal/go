@@ -191,7 +191,7 @@ func nilcheckelim(f *Func) {
 const minZeroPage = 4096
 
 // faultOnLoad is true if a load to an address below minZeroPage will trigger a SIGSEGV.
-var faultOnLoad = objabi.GOOS != "aix"
+var faultOnLoad = objabi.GOOS != "aix" && objabi.GOOS != "os400"
 
 // nilcheckelim2 eliminates unnecessary nil checks.
 // Runs after lowering and scheduling.

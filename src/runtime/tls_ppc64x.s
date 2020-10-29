@@ -9,6 +9,10 @@
 #include "funcdata.h"
 #include "textflag.h"
 
+#ifdef GOOS_os400
+#define GOOS_aix
+#endif
+
 // We have to resort to TLS variable to save g (R30).
 // One reason is that external code might trigger
 // SIGSEGV, and our runtime.sigtramp don't even know we

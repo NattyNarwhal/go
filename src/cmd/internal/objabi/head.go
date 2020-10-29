@@ -52,7 +52,7 @@ const (
 
 func (h *HeadType) Set(s string) error {
 	switch s {
-	case "aix":
+	case "aix", "os400":
 		*h = Haix
 	case "darwin":
 		*h = Hdarwin

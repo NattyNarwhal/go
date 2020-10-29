@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// +build aix darwin dragonfly freebsd linux netbsd openbsd solaris
+// +build aix darwin dragonfly freebsd linux netbsd openbsd os400 solaris
 
 // Fork, exec, wait, etc.
 
@@ -290,7 +290,7 @@ func Exec(argv0 string, argv []string, envv []string) (err error) {
 	runtime_BeforeExec()
 
 	var err1 error
-	if runtime.GOOS == "solaris" || runtime.GOOS == "illumos" || runtime.GOOS == "aix" {
+	if runtime.GOOS == "solaris" || runtime.GOOS == "illumos" || runtime.GOOS == "aix" || runtime.GOOS == "os400" {
 		// RawSyscall should never be used on Solaris, illumos, or AIX.
 		err1 = execveLibc(
 			uintptr(unsafe.Pointer(argv0p)),

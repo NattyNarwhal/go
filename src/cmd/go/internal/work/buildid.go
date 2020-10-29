@@ -329,7 +329,7 @@ func (b *Builder) gccgoBuildIDFile(a *Action) (string, error) {
 	sfile := a.Objdir + "_buildid.s"
 
 	var buf bytes.Buffer
-	if cfg.Goos == "aix" {
+	if cfg.Goos == "aix" || cfg.Goos == "os400" {
 		fmt.Fprintf(&buf, "\t.csect .go.buildid[XO]\n")
 	} else if (cfg.Goos != "solaris" && cfg.Goos != "illumos") || assemblerIsGas() {
 		fmt.Fprintf(&buf, "\t"+`.section .go.buildid,"e"`+"\n")
@@ -350,7 +350,7 @@ func (b *Builder) gccgoBuildIDFile(a *Action) (string, error) {
 		fmt.Fprintf(&buf, "%#02x", a.buildID[i])
 	}
 	fmt.Fprintf(&buf, "\n")
-	if cfg.Goos != "solaris" && cfg.Goos != "illumos" && cfg.Goos != "aix" {
+	if cfg.Goos != "solaris" && cfg.Goos != "illumos" && cfg.Goos != "aix" && cfg.Goos != "os400" {
 		secType := "@progbits"
 		if cfg.Goarch == "arm" {
 			secType = "%progbits"

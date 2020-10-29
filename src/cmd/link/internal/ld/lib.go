@@ -757,7 +757,7 @@ func (ctxt *Link) linksetup() {
 		}
 	}
 
-	if ctxt.LinkMode == LinkExternal && ctxt.Arch.Family == sys.PPC64 && objabi.GOOS != "aix" {
+	if ctxt.LinkMode == LinkExternal && ctxt.Arch.Family == sys.PPC64 && (objabi.GOOS != "aix" && objabi.GOOS != "os400") {
 		toc := ctxt.loader.LookupOrCreateSym(".TOC.", 0)
 		sb := ctxt.loader.MakeSymbolUpdater(toc)
 		sb.SetType(sym.SDYNIMPORT)
@@ -1840,7 +1840,7 @@ func hostlinkArchArgs(arch *sys.Arch) []string {
 	case sys.MIPS:
 		return []string{"-mabi=32"}
 	case sys.PPC64:
-		if objabi.GOOS == "aix" {
+		if objabi.GOOS == "aix" || objabi.GOOS == "os400" {
 			return []string{"-maix64"}
 		} else {
 			return []string{"-m64"}

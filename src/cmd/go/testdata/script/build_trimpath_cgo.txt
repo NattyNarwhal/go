@@ -121,7 +121,7 @@ func readDWARF(exePath string) (*dwarf.Data, error) {
 	return machoFile.DWARF()
 }
 -- list-dwarf/read_elf.go --
-// +build android dragonfly freebsd illumos linux netbsd openbsd solaris
+// +build android dragonfly freebsd illumos linux netbsd openbsd solaris os400
 
 package main
 

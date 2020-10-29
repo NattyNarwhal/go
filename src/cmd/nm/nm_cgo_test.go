@@ -33,6 +33,8 @@ func canInternalLink() bool {
 			return false
 		}
 	}
+	case "os400":
+		return false
 	return true
 }
 

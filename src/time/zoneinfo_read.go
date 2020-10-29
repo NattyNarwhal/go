@@ -268,6 +268,8 @@ func LoadLocationFromTZData(name string, data []byte) (*Location, error) {
 		}
 		zone[i].name = byteString(abbrev[b:])
 		if runtime.GOOS == "aix" && len(name) > 8 && (name[:8] == "Etc/GMT+" || name[:8] == "Etc/GMT-") {
+			// TODO(os4oo): This shouldn't affect us for now since we don't ship timezones
+
 			// There is a bug with AIX 7.2 TL 0 with files in Etc,
 			// GMT+1 will return GMT-1 instead of GMT+1 or -01.
 			if name != "Etc/GMT+0" {

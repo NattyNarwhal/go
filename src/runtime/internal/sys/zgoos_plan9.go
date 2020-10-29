@@ -18,6 +18,7 @@ const GoosLinux = 0
 const GoosNacl = 0
 const GoosNetbsd = 0
 const GoosOpenbsd = 0
+const GoosOs400 = 0
 const GoosPlan9 = 1
 const GoosSolaris = 0
 const GoosWindows = 0

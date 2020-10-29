@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// +build aix darwin dragonfly freebsd linux netbsd openbsd solaris
+// +build aix darwin dragonfly freebsd linux netbsd openbsd os400 solaris
 
 package syscall_test
 
@@ -137,7 +137,7 @@ func TestPassFD(t *testing.T) {
 		return
 	}
 
-	if runtime.GOOS == "aix" {
+	if runtime.GOOS == "aix"{
 		// Unix network isn't properly working on AIX 7.2 with Technical Level < 2
 		out, err := exec.Command("oslevel", "-s").Output()
 		if err != nil {
@@ -155,6 +155,11 @@ func TestPassFD(t *testing.T) {
 			t.Skip("skipped on AIX versions previous to 7.2 TL 2")
 		}
 
+	}
+
+	if runtime.GOOS == "os400" {
+		// TODO: Check if this can work on some version of IBM i
+		t.Skip("Skipped on IBM i for now")
 	}
 
 	tempDir, err := ioutil.TempDir("", "TestPassFD")

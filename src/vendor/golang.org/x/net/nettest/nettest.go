@@ -53,6 +53,9 @@ func probeStack() {
 			tl, _ := strconv.Atoi(string(out[5:7]))
 			unStrmDgramEnabled = ver > "7200" || (ver == "7200" && tl >= 2)
 		}
+	case "os400":
+		// TODO: Check if this can work on IBM i
+		unStrmDgramEnabled = false
 	default:
 		unStrmDgramEnabled = true
 	}
@@ -116,7 +119,7 @@ func TestableNetwork(network string) bool {
 		switch runtime.GOOS {
 		case "android", "fuchsia", "hurd", "js", "nacl", "plan9", "windows":
 			return false
-		case "aix":
+		case "aix", "os400":
 			return unixStrmDgramEnabled()
 		case "darwin":
 			// iOS does not support unix, unixgram.
@@ -126,7 +129,7 @@ func TestableNetwork(network string) bool {
 		}
 	case "unixpacket":
 		switch runtime.GOOS {
-		case "aix", "android", "fuchsia", "hurd", "darwin", "js", "nacl", "plan9", "windows":
+		case "aix", "android", "fuchsia", "hurd", "darwin", "js", "nacl", "os400", "plan9", "windows":
 			return false
 		case "netbsd":
 			// It passes on amd64 at least. 386 fails

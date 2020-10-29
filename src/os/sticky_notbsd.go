@@ -9,6 +9,7 @@
 // +build !js !wasm
 // +build !netbsd
 // +build !openbsd
+// +build !os400
 // +build !solaris
 
 package os

@@ -52,7 +52,7 @@ func TestStmtLines(t *testing.T) {
 		t.Skip("skipping on plan9; no DWARF symbol table in executables")
 	}
 
-	if runtime.GOOS == "aix" {
+	if runtime.GOOS == "aix" || runtime.GOOS == "os400" {
 		extld := os.Getenv("CC")
 		if extld == "" {
 			extld = "gcc"

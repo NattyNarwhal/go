@@ -13,4 +13,4 @@ const SpAlign = 1*(1-GoarchArm64) + 16*GoarchArm64 // SP alignment: 1 normally, 
 var DefaultGoroot string // set at link time
 
 // AIX requires a larger stack for syscalls.
-const StackGuardMultiplier = StackGuardMultiplierDefault*(1-GoosAix) + 2*GoosAix
+const StackGuardMultiplier = StackGuardMultiplierDefault*(1-GoosAix+GoosOs400) + 2*(GoosAix+GoosOs400)

@@ -1578,7 +1578,7 @@ func runBinHostname(t *testing.T) string {
 	defer r.Close()
 	const path = "/bin/hostname"
 	argv := []string{"hostname"}
-	if runtime.GOOS == "aix" {
+	if runtime.GOOS == "aix" || runtime.GOOS == "os400" {
 		argv = []string{"hostname", "-s"}
 	}
 	p, err := StartProcess(path, argv, &ProcAttr{Files: []*File{nil, w, Stderr}})

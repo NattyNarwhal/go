@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// +build aix darwin dragonfly freebsd js,wasm linux netbsd openbsd solaris windows
+// +build aix darwin dragonfly freebsd js,wasm linux netbsd openbsd os400 solaris windows
 
 package runtime
 
@@ -214,7 +214,7 @@ func poll_runtime_pollWait(pd *pollDesc, mode int) int {
 		return errcode
 	}
 	// As for now only Solaris, illumos, and AIX use level-triggered IO.
-	if GOOS == "solaris" || GOOS == "illumos" || GOOS == "aix" {
+	if GOOS == "solaris" || GOOS == "illumos" || GOOS == "aix"  || GOOS == "os400" {
 		netpollarm(pd, mode)
 	}
 	for !netpollblock(pd, int32(mode), false) {

@@ -186,7 +186,7 @@ func buildModeInit() {
 			codegenArg = "-fPIE"
 		} else {
 			switch cfg.Goos {
-			case "aix", "windows":
+			case "aix", "os400", "windows":
 			default:
 				codegenArg = "-shared"
 			}

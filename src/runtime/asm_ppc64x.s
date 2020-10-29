@@ -10,6 +10,10 @@
 #include "textflag.h"
 #include "asm_ppc64x.h"
 
+#ifdef GOOS_os400
+#define GOOS_aix
+#endif
+
 #ifdef GOOS_aix
 #define cgoCalleeStackSize 48
 #else
@@ -114,6 +118,7 @@ TEXT runtime·asminit(SB),NOSPLIT|NOFRAME,$0-0
 	RET
 
 // Any changes must be reflected to runtime/cgo/gcc_aix_ppc64.S:.crosscall_ppc64
+// and runtime/cgo/gcc_os400_ppc64.S:.crosscall_ppc64
 TEXT _cgo_reginit(SB),NOSPLIT|NOFRAME,$0-0
 	// crosscall_ppc64 and crosscall2 need to reginit, but can't
 	// get at the 'runtime.reginit' symbol.

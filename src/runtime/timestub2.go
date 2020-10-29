@@ -7,6 +7,7 @@
 // +build !freebsd
 // +build !aix
 // +build !solaris
+// +build !os400
 
 package runtime
 

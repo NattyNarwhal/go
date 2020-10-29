@@ -38,7 +38,7 @@ func (mode *BuildMode) Set(s string) error {
 		*mode = BuildModeExe
 	case "pie":
 		switch objabi.GOOS {
-		case "aix", "android", "linux", "windows":
+		case "aix", "android", "linux", "os400", "windows":
 		case "darwin", "freebsd":
 			switch objabi.GOARCH {
 			case "amd64":
@@ -51,7 +51,7 @@ func (mode *BuildMode) Set(s string) error {
 		*mode = BuildModePIE
 	case "c-archive":
 		switch objabi.GOOS {
-		case "aix", "darwin", "linux":
+		case "aix", "darwin", "linux", "os400":
 		case "freebsd":
 			switch objabi.GOARCH {
 			case "amd64":
@@ -265,7 +265,7 @@ func determineLinkMode(ctxt *Link) {
 		switch {
 		case objabi.GOARCH == "riscv64":
 			Exitf("external linking not supported for %s/riscv64", objabi.GOOS)
-		case objabi.GOARCH == "ppc64" && objabi.GOOS != "aix":
+		case objabi.GOARCH == "ppc64" && (objabi.GOOS != "aix" && objabi.GOOS != "os400"):
 			Exitf("external linking not supported for %s/ppc64", objabi.GOOS)
 		}
 	}

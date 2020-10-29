@@ -23,7 +23,7 @@ if [[ "$GOOS" = "linux" ]] && [[ "$GOLANG_SYS_BUILD" != "docker" ]]; then
 	exit 1
 fi
 
-if [[ "$GOOS" = "aix" ]]; then
+if [[ "$GOOS" = "aix" ]] || [[ "$GOOS" = "os400" ]]; then
 	CC=${CC:-gcc}
 else
 	CC=${CC:-cc}
@@ -356,6 +356,22 @@ includes_OpenBSD='
 #define SIOCGIFGENERIC		0xc020693a
 #define SIOCSIFGENERIC		0x80206939
 #define WALTSIG			0x4
+'
+
+includes_OS400='
+#include <net/if.h>
+#include <net/netopt.h>
+#include <netinet/ip_mroute.h>
+#include <sys/protosw.h>
+#include <sys/stropts.h>
+#include <sys/mman.h>
+#include <sys/poll.h>
+#include <sys/select.h>
+#include <sys/termio.h>
+#include <termios.h>
+#include <fcntl.h>
+
+#define AF_LOCAL AF_UNIX
 '
 
 includes_SunOS='

@@ -29,6 +29,10 @@ func init() {
 			unixEnabledOnAIX = aixVer > "7200" || (aixVer == "7200" && tl >= 2)
 		}
 	}
+	if runtime.GOOS == "os400" {
+		// TODO: Figure out if this works in PASE and when
+		unixEnabledOnAIX = false
+	}
 }
 
 // testableNetwork reports whether network is testable on the current
@@ -50,7 +54,7 @@ func testableNetwork(network string) bool {
 		switch runtime.GOOS {
 		case "android", "plan9", "windows":
 			return false
-		case "aix":
+		case "aix", "os400":
 			return unixEnabledOnAIX
 		}
 		// iOS does not support unix, unixgram.
@@ -59,7 +63,7 @@ func testableNetwork(network string) bool {
 		}
 	case "unixpacket":
 		switch runtime.GOOS {
-		case "aix", "android", "darwin", "plan9", "windows":
+		case "aix", "android", "darwin", "os400", "plan9", "windows":
 			return false
 		case "netbsd":
 			// It passes on amd64 at least. 386 fails (Issue 22927). arm is unknown.

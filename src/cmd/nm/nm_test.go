@@ -147,7 +147,7 @@ func testGoExec(t *testing.T, iscgo, isexternallinker bool) {
 		"runtime.noptrdata": "D",
 	}
 
-	if runtime.GOOS == "aix" && iscgo {
+	if (runtime.GOOS == "aix" || runtime.GOOS == "os400") && iscgo {
 		// pclntab is moved to .data section on AIX.
 		runtimeSyms["runtime.epclntab"] = "D"
 	}
@@ -158,7 +158,7 @@ func testGoExec(t *testing.T, iscgo, isexternallinker bool) {
 	}
 
 	relocated := func(code string) bool {
-		if runtime.GOOS == "aix" {
+		if runtime.GOOS == "aix" || runtime.GOOS == "os400" {
 			// On AIX, .data and .bss addresses are changed by the loader.
 			// Therefore, the values returned by the exec aren't the same
 			// than the ones inside the symbol table.
@@ -286,7 +286,7 @@ func testGoLib(t *testing.T, iscgo bool) {
 		if runtime.GOOS == "darwin" || (runtime.GOOS == "windows" && runtime.GOARCH == "386") {
 			syms = append(syms, symType{"D", "_cgodata", true, false})
 			syms = append(syms, symType{"T", "_cgofunc", true, false})
-		} else if runtime.GOOS == "aix" {
+		} else if runtime.GOOS == "aix" || runtime.GOOS == "os400" {
 			syms = append(syms, symType{"D", "cgodata", true, false})
 			syms = append(syms, symType{"T", ".cgofunc", true, false})
 		} else {

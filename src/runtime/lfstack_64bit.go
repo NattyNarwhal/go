@@ -36,11 +36,17 @@ const (
 	// We use one bit to distinguish between the two ranges.
 	aixAddrBits = 57
 	aixCntBits  = 64 - aixAddrBits + 3
+
+	os400AddrBits = 57
+	os400CntBits = 64 - os400AddrBits + 3
 )
 
 func lfstackPack(node *lfnode, cnt uintptr) uint64 {
 	if GOARCH == "ppc64" && GOOS == "aix" {
 		return uint64(uintptr(unsafe.Pointer(node)))<<(64-aixAddrBits) | uint64(cnt&(1<<aixCntBits-1))
+	}
+	if GOARCH == "ppc64" && GOOS == "os400" {
+		return uint64(uintptr(unsafe.Pointer(node)))<<(64-os400AddrBits) | uint64(cnt&(1<<os400CntBits-1))
 	}
 	return uint64(uintptr(unsafe.Pointer(node)))<<(64-addrBits) | uint64(cnt&(1<<cntBits-1))
 }
@@ -53,6 +59,9 @@ func lfstackUnpack(val uint64) *lfnode {
 	}
 	if GOARCH == "ppc64" && GOOS == "aix" {
 		return (*lfnode)(unsafe.Pointer(uintptr((val >> aixCntBits << 3) | 0xa<<56)))
+	}
+	if GOARCH == "ppc64" && GOOS == "os400" {
+		return (*lfnode)(unsafe.Pointer(uintptr((val >> os400CntBits << 3) | 0x7<<56)))
 	}
 	return (*lfnode)(unsafe.Pointer(uintptr(val >> cntBits << 3)))
 }

@@ -145,6 +145,16 @@ func (p *noder) pragcgo(pos syntax.Pos, text string) {
 					return
 				}
 			}
+			if objabi.GOOS == "os400" && f[3] != "" {
+				// On Aix, library pattern must be "lib.a/object.o"
+				// or "lib.a/libname.so.X"
+				// TODO: Add svr4-style imports
+				n := strings.Split(f[3], "/")
+				if len(n) != 2 || !strings.HasSuffix(n[0], ".a") || (!strings.HasSuffix(n[1], ".o") && !strings.Contains(n[1], ".so.")) {
+					p.error(syntax.Error{Pos: pos, Msg: `usage: //go:cgo_import_dynamic local [remote ["lib.a/object.o"]]`})
+					return
+				}
+			}
 		default:
 			p.error(syntax.Error{Pos: pos, Msg: `usage: //go:cgo_import_dynamic local [remote ["library"]]`})
 			return

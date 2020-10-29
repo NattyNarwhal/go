@@ -1592,7 +1592,7 @@ func (p *Package) gccCmd() []string {
 
 	c = append(c, p.GccOptions...)
 	c = append(c, p.gccMachine()...)
-	if goos == "aix" {
+	if goos == "aix" || goos == "os400" {
 		c = append(c, "-maix64")
 		c = append(c, "-mcmodel=large")
 	}

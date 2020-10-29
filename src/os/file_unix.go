@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// +build aix darwin dragonfly freebsd js,wasm linux netbsd openbsd solaris
+// +build aix darwin dragonfly freebsd js,wasm linux netbsd openbsd solaris os400
 
 package os
 
@@ -367,7 +367,7 @@ func Readlink(name string) (string, error) {
 		b := make([]byte, len)
 		n, e := fixCount(syscall.Readlink(name, b))
 		// buffer too small
-		if runtime.GOOS == "aix" && e == syscall.ERANGE {
+		if (runtime.GOOS == "aix" || runtime.GOOS == "os400") && e == syscall.ERANGE {
 			continue
 		}
 		if e != nil {

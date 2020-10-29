@@ -4523,7 +4523,7 @@ func (s *state) call(n *Node, k callKind) *ssa.Value {
 // maybeNilCheckClosure checks if a nil check of a closure is needed in some
 // architecture-dependent situations and, if so, emits the nil check.
 func (s *state) maybeNilCheckClosure(closure *ssa.Value, k callKind) {
-	if thearch.LinkArch.Family == sys.Wasm || objabi.GOOS == "aix" && k != callGo {
+	if thearch.LinkArch.Family == sys.Wasm || (objabi.GOOS == "aix" || objabi.GOOS == "os400") && k != callGo {
 		// On AIX, the closure needs to be verified as fn can be nil, except if it's a call go. This needs to be handled by the runtime to have the "go of nil func value" error.
 		// TODO(neelance): On other architectures this should be eliminated by the optimization steps
 		s.nilCheck(closure)

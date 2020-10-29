@@ -23,7 +23,7 @@ var slashslash = []byte("//")
 // The file is accepted only if each such line lists something
 // matching the file. For example:
 //
-//	// +build windows linux
+//	// +build windows linux os400
 //
 // marks the file as applicable only on Windows and Linux.
 //
@@ -213,6 +213,7 @@ var KnownOS = map[string]bool{
 	"nacl":      true, // legacy; don't remove
 	"netbsd":    true,
 	"openbsd":   true,
+	"os400":     true,
 	"plan9":     true,
 	"solaris":   true,
 	"windows":   true,

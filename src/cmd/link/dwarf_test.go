@@ -42,7 +42,7 @@ func testDWARF(t *testing.T, buildmode string, expectDWARF bool, env ...string) 
 	for _, prog := range []string{"testprog", "testprogcgo"} {
 		prog := prog
 		expectDWARF := expectDWARF
-		if runtime.GOOS == "aix" && prog == "testprogcgo" {
+		if (runtime.GOOS == "aix" || runtime.GOOS == "os400") && prog == "testprogcgo" {
 			extld := os.Getenv("CC")
 			if extld == "" {
 				extld = "gcc"

@@ -293,7 +293,7 @@ func TestParseCGOArchive(t *testing.T) {
 				}
 			}
 		}
-	case "aix":
+	case "aix", "os400":
 		c1 = "." + c1
 		c2 = "." + c2
 		for _, obj := range p.Native {

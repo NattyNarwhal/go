@@ -915,6 +915,7 @@ func (t *tester) extLink() bool {
 	pair := gohostos + "-" + goarch
 	switch pair {
 	case "aix-ppc64",
+	        "os400-ppc64",
 		"android-arm", "android-arm64",
 		"darwin-amd64", "darwin-arm64",
 		"dragonfly-amd64",
@@ -950,7 +951,7 @@ func (t *tester) internalLink() bool {
 	if goarch == "mips64" || goarch == "mips64le" || goarch == "mips" || goarch == "mipsle" {
 		return false
 	}
-	if goos == "aix" {
+	if goos == "aix" || goos == "os400" {
 		// linkmode=internal isn't supported.
 		return false
 	}

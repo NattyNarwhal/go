@@ -91,6 +91,7 @@ var okgoos = []string{
 	"plan9",
 	"windows",
 	"aix",
+	"os400",
 }
 
 // find reports the first index of p in l[0:n], or else -1.
@@ -1549,6 +1550,7 @@ var cgoEnabled = map[string]bool{
 	"openbsd/amd64":   true,
 	"openbsd/arm":     true,
 	"openbsd/arm64":   true,
+	"os400/ppc64":     true,
 	"plan9/386":       false,
 	"plan9/amd64":     false,
 	"plan9/arm":       false,

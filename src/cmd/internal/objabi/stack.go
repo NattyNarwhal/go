@@ -26,7 +26,7 @@ var StackLimit = StackGuard - StackSystem - StackSmall
 // builds that have larger stack frames or for specific targets.
 func stackGuardMultiplier() int {
 	// On AIX, a larger stack is needed for syscalls.
-	if GOOS == "aix" {
+	if GOOS == "aix" || GOOS == "os400" {
 		return 2
 	}
 	return stackGuardMultiplierDefault

@@ -1736,7 +1736,7 @@ func ssaGenValue(s *gc.SSAGenState, v *ssa.Value) {
 		s.UseArgs(16) // space used in callee args area by assembly stubs
 
 	case ssa.OpPPC64LoweredNilCheck:
-		if objabi.GOOS == "aix" {
+		if objabi.GOOS == "aix" || objabi.GOOS == "os400" {
 			// CMP Rarg0, R0
 			// BNE 2(PC)
 			// STW R0, 0(R0)

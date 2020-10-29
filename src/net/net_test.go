@@ -560,7 +560,7 @@ func TestNotTemporaryRead(t *testing.T) {
 	if runtime.GOOS == "freebsd" {
 		testenv.SkipFlaky(t, 25289)
 	}
-	if runtime.GOOS == "aix" {
+	if runtime.GOOS == "aix" || runtime.GOOS == "os400" {
 		testenv.SkipFlaky(t, 29685)
 	}
 	t.Parallel()

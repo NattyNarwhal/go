@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// +build aix linux
+// +build aix linux os400
 // +build ppc64 ppc64le
 
 package runtime

@@ -376,7 +376,7 @@ func dynimport(obj string) {
 			fatalf("cannot load imported symbols from XCOFF file %s: %v", obj, err)
 		}
 		for _, s := range sym {
-			if s.Name == "runtime_rt0_go" || s.Name == "_rt0_ppc64_aix_lib" {
+			if s.Name == "runtime_rt0_go" || s.Name == "_rt0_ppc64_aix_lib" || s.Name == "_rt0_ppc64_os400_lib" {
 				// These symbols are imported by runtime/cgo but
 				// must not be added to _cgo_import.go as there are
 				// Go symbols.

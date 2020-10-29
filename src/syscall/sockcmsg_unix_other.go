@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// +build aix darwin freebsd linux netbsd openbsd solaris
+// +build aix darwin freebsd linux netbsd openbsd os400 solaris
 
 package syscall
 
@@ -17,7 +17,7 @@ func cmsgAlignOf(salen int) int {
 	// dragonfly needs to check ABI version at runtime, see cmsgAlignOf in
 	// sockcmsg_dragonfly.go
 	switch runtime.GOOS {
-	case "aix":
+	case "aix", "os400":
 		// There is no alignment on AIX.
 		salign = 1
 	case "darwin", "illumos", "solaris":

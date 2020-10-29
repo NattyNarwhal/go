@@ -56,7 +56,7 @@ func main() {
 
 	gohostos = runtime.GOOS
 	switch gohostos {
-	case "aix":
+	case "aix", "os400":
 		// uname -m doesn't work under AIX
 		gohostarch = "ppc64"
 	case "darwin":

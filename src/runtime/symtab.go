@@ -539,7 +539,7 @@ func moduledataverify1(datap *moduledata) {
 			for j := 0; j <= i; j++ {
 				print("\t", hex(datap.ftab[j].entry), " ", funcname(funcInfo{(*_func)(unsafe.Pointer(&datap.pclntable[datap.ftab[j].funcoff])), datap}), "\n")
 			}
-			if GOOS == "aix" && isarchive {
+			if (GOOS == "aix" || GOOS == "os400") && isarchive {
 				println("-Wl,-bnoobjreorder is mandatory on aix/ppc64 with c-archive")
 			}
 			throw("invalid runtime symbol table")

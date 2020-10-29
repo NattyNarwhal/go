@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// +build aix darwin dragonfly freebsd linux netbsd openbsd solaris
+// +build aix darwin dragonfly freebsd linux netbsd openbsd os400 solaris
 
 package runtime_test
 
@@ -34,7 +34,7 @@ func TestPhysPageSize(t *testing.T) {
 		t.Fatalf("Mmap: %v", err)
 	}
 
-	if runtime.GOOS == "aix" {
+	if runtime.GOOS == "aix" || runtime.GOOS == "os400" {
 		// AIX does not allow mapping a range that is already mapped.
 		runtime.Munmap(unsafe.Pointer(uintptr(b)), 2*ps)
 	}

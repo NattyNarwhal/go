@@ -206,7 +206,7 @@ func (tools gccgoToolchain) pack(b *Builder, a *Action, afile string, ofiles []s
 		absOfiles = append(absOfiles, mkAbs(objdir, f))
 	}
 	var arArgs []string
-	if cfg.Goos == "aix" && cfg.Goarch == "ppc64" {
+	if (cfg.Goos == "aix" || cfg.Goos == "os400") && cfg.Goarch == "ppc64" {
 		// AIX puts both 32-bit and 64-bit objects in the same archive.
 		// Tell the AIX "ar" command to only care about 64-bit objects.
 		arArgs = []string{"-X64"}
@@ -266,7 +266,7 @@ func (tools gccgoToolchain) link(b *Builder, root *Action, out, importcfg string
 	}
 
 	var arArgs []string
-	if cfg.Goos == "aix" && cfg.Goarch == "ppc64" {
+	if (cfg.Goos == "aix" || cfg.Goos == "os400") && cfg.Goarch == "ppc64" {
 		// AIX puts both 32-bit and 64-bit objects in the same archive.
 		// Tell the AIX "ar" command to only care about 64-bit objects.
 		arArgs = []string{"-X64"}
@@ -388,7 +388,7 @@ func (tools gccgoToolchain) link(b *Builder, root *Action, out, importcfg string
 
 	wholeArchive := []string{"-Wl,--whole-archive"}
 	noWholeArchive := []string{"-Wl,--no-whole-archive"}
-	if cfg.Goos == "aix" {
+	if cfg.Goos == "aix" || cfg.Goos == "os400" {
 		wholeArchive = nil
 		noWholeArchive = nil
 	}
@@ -401,7 +401,7 @@ func (tools gccgoToolchain) link(b *Builder, root *Action, out, importcfg string
 	if root.Package != nil {
 		ldflags = append(ldflags, root.Package.CgoLDFLAGS...)
 	}
-	if cfg.Goos != "aix" {
+	if cfg.Goos != "aix" && cfg.Goos != "os400" {
 		ldflags = str.StringList("-Wl,-(", ldflags, "-Wl,-)")
 	}
 
@@ -415,7 +415,7 @@ func (tools gccgoToolchain) link(b *Builder, root *Action, out, importcfg string
 	}
 
 	var rLibPath string
-	if cfg.Goos == "aix" {
+	if cfg.Goos == "aix" || cfg.Goos == "os400" {
 		rLibPath = "-Wl,-blibpath="
 	} else {
 		rLibPath = "-Wl,-rpath="
@@ -474,7 +474,7 @@ func (tools gccgoToolchain) link(b *Builder, root *Action, out, importcfg string
 		ldflags = append(ldflags, "-lgo", "-lgcc_s", "-lgcc", "-lc", "-lgcc")
 
 	case "shared":
-		if cfg.Goos != "aix" {
+		if cfg.Goos != "aix" && cfg.Goos != "os400" {
 			ldflags = append(ldflags, "-zdefs")
 		}
 		ldflags = append(ldflags, "-shared", "-nostdlib", "-lgo", "-lgcc_s", "-lgcc", "-lc")

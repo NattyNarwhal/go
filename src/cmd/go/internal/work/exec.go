@@ -753,7 +753,7 @@ func (b *Builder) build(a *Action) (err error) {
 	// This is read by readGccgoArchive in cmd/internal/buildid/buildid.go.
 	if a.buildID != "" && cfg.BuildToolchainName == "gccgo" {
 		switch cfg.Goos {
-		case "aix", "android", "dragonfly", "freebsd", "illumos", "linux", "netbsd", "openbsd", "solaris":
+		case "aix", "android", "dragonfly", "freebsd", "illumos", "linux", "netbsd", "openbsd", "os400", "solaris":
 			asmfile, err := b.gccgoBuildIDFile(a)
 			if err != nil {
 				return err
@@ -2366,7 +2366,7 @@ func (b *Builder) compilerCmd(compiler []string, incdir, workdir string) []strin
 		}
 	}
 
-	if cfg.Goos == "aix" {
+	if cfg.Goos == "aix" || cfg.Goos == "os400" {
 		// mcmodel=large must always be enabled to allow large TOC.
 		a = append(a, "-mcmodel=large")
 	}
@@ -2492,7 +2492,7 @@ func (b *Builder) gccArchArgs() []string {
 	case "mips", "mipsle":
 		return []string{"-mabi=32", "-march=mips32"}
 	case "ppc64":
-		if cfg.Goos == "aix" {
+		if cfg.Goos == "aix" || cfg.Goos == "os400" {
 			return []string{"-maix64"}
 		}
 	}

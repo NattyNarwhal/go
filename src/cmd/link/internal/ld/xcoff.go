@@ -15,6 +15,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"fmt"
 )
 
 // This file handles all algorithms related to XCOFF files generation.
@@ -1184,7 +1185,7 @@ func (ctxt *Link) doxcoff() {
 	// Add entry point to .loader symbols.
 	ep := ldr.Lookup(*flagEntrySymbol, 0)
 	if ep == 0 || !ldr.AttrReachable(ep) {
-		Exitf("wrong entry point")
+		Exitf(fmt.Sprintf("wrong entry point: %x", ep))
 	}
 
 	xfile.loaderSymbols = append(xfile.loaderSymbols, &xcoffLoaderSymbol{

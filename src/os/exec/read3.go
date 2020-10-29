@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+// TODO: Need to ignore this on os400 since we can't show open files
 // +build ignore
 
 // This is a test program that verifies that it can read from
