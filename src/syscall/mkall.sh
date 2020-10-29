@@ -121,6 +121,11 @@ aix_ppc64)
 	mksyscall="./mksyscall_libc.pl -aix"
 	mktypes="GOARCH=$GOARCH go tool cgo -godefs"
 	;;
+os400_ppc64)
+	mkerrors="$mkerrors -maix64"
+	mksyscall="./mksyscall_libc.pl -aix"
+	mktypes="GOARCH=$GOARCH go tool cgo -godefs"
+	;;
 darwin_amd64)
 	mkerrors="$mkerrors -m64"
 	mksyscall="./mksyscall.pl -darwin"

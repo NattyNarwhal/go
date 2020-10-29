@@ -23,7 +23,7 @@ my $cmdline = "mksyscall_libc.pl " . join(' ', @ARGV);
 my $errors = 0;
 my $_32bit = "";
 my $tags = "";  # build tags
-my $aix = 0;
+my $aix = 0; # covers os400 as well
 my $solaris = 0;
 
 binmode STDOUT;
