@@ -6,6 +6,5 @@ package x509
 
 // Possible certificate files; stop after finding one.
 var certFiles = []string{
-	// TODO(os400): We don't ship a bundle
-	//"/QOpenSys/var/lib/ca-certificates/ca-bundle.crt",
+    "/QOpenSys/var/lib/ca-certificates/ca-bundle.pem",
 }
