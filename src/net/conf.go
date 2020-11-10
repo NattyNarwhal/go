@@ -93,6 +93,11 @@ func initConfVal() {
 		return
 	}
 
+    if runtime.GOOS == "os400" {
+        confVal.forceCgoLookupHost = true
+        return
+    }
+
 	if runtime.GOOS != "openbsd" {
 		confVal.nss = parseNSSConfFile("/etc/nsswitch.conf")
 	}
