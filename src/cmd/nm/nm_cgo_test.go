@@ -32,9 +32,9 @@ func canInternalLink() bool {
 		case "arm64":
 			return false
 		}
-	}
 	case "os400":
 		return false
+	}
 	return true
 }
 
