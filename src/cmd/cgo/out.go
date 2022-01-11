@@ -389,6 +389,10 @@ func dynimport(obj string) {
 			fatalf("cannot load imported libraries from XCOFF file %s: %v", obj, err)
 		}
 		for _, l := range lib {
+			// XXX: WHY
+			if l == "../" {
+				continue
+			}
 			fmt.Fprintf(stdout, "//go:cgo_import_dynamic _ _ %q\n", l)
 		}
 		return
